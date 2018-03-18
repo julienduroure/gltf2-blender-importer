@@ -119,9 +119,6 @@ class Node():
         if parent is None:
             return
 
-        print("parent : " + self.scene.nodes[parent].blender_object)
-        print("..end")
-
         for node in self.gltf.scene.nodes.values(): # TODO if parent is in another scene
             if node.index == parent:
                 if node.blender_object:
@@ -139,7 +136,6 @@ class Node():
 
                 if anim.path == "translation":
                     blender_path = "location"
-                    print(anim.data)
                     for key in anim.data:
                        obj.location = Vector(self.convert_location(list(key[1])))
                        obj.keyframe_insert(blender_path, frame = key[0] * fps, group='location')
