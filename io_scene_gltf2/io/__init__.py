@@ -183,7 +183,8 @@ class glTFImporter():
                 'bufferViews',
                 'buffers',
                 'materials',
-                'animations'
+                'animations',
+                'cameras'
                 ]
 
         for key in self.json.keys():

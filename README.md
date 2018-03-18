@@ -22,7 +22,8 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
         *  with embeded data  
 *  geometry
 *  children management
-*  Morph (shapekeys)
+*  Morph (shapekeys)  
+*  Camera (only type pers/ortho, and clipping)
 *  animations  
     *  node animations  
     *  morph animations (shapekeys)  

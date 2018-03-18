@@ -36,6 +36,7 @@ class Node():
         self.root = root
         self.scene = scene # Reference to scene
         self.mesh = None
+        self.camera = None
         self.children = []
         self.blender_object = ""
         self.anims = []
@@ -54,6 +55,11 @@ class Node():
             self.mesh = Mesh(self.json['mesh'], self.gltf.json['meshes'][self.json['mesh']], self.gltf)
             self.mesh.read()
             self.mesh.debug_missing()
+
+        if 'camera' in self.json.keys():
+            self.camera = Camera(self.json['camera'], self.name, self.gltf.json['cameras'][self.json['camera']], self.gltf)
+            self.camera.read()
+            self.camera.debug_missing()
 
 
         if not 'children' in self.json.keys():
@@ -339,7 +345,16 @@ class Node():
             self.blender_create_anim()
             return
 
-        # No mesh. For now, create empty #TODO
+        if self.camera:
+            obj = self.camera.create_blender()
+            self.set_transforms(obj) #TODO default rotation of cameras ?
+            self.blender_object = obj.name
+            self.set_parent(obj, parent)
+
+            return
+
+
+        # No mesh, no camera. For now, create empty #TODO
 
         if self.name:
             print("Blender create node " + self.name)
@@ -363,7 +378,8 @@ class Node():
                 'translation',
                 'rotation',
                 'scale',
-                'children'
+                'children',
+                'camera'
                 ]
 
         for key in self.json.keys():
