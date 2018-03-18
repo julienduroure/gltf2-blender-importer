@@ -55,9 +55,13 @@ class Primitive():
 
         # reading materials
         if 'material' in self.json.keys():
-            # create material
-            self.mat = Material(self.json['material'], self.gltf.json['materials'][self.json['material']], self.gltf)
-            self.gltf.materials[self.json['material']] = self.mat
+            # create material if not alreadt exits
+            if self.json['material'] not in self.gltf.materials.keys():
+                self.mat = Material(self.json['material'], self.gltf.json['materials'][self.json['material']], self.gltf)
+                self.gltf.materials[self.json['material']] = self.mat
+            else:
+                # Use already existing material
+                self.mat = self.gltf.materials[self.json['material']]
 
         # reading targets (shapekeys) if any
         if 'targets' in self.json.keys():
