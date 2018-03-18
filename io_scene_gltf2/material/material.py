@@ -31,5 +31,10 @@ class Material():
         self.blender_material = None
 
     def create_blender(self):
-        mat = bpy.data.materials.new(self.json['name'])
+        if 'name' in self.json:
+            self.name = self.json['name']
+        else:
+            self.name = "Material_" + str(self.index)
+            
+        mat = bpy.data.materials.new(self.name)
         self.blender_material = mat.name
