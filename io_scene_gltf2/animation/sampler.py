@@ -36,8 +36,6 @@ class Sampler():
         self.output = Accessor(self.json['output'], self.gltf.json['accessors'][self.json['output']], self.gltf)
         input_data  = self.input.read()
         output_data = self.output.read()
-        print(input_data)
-        print(output_data)
 
         anim_data = []
 
