@@ -40,6 +40,7 @@ class Node():
         self.children = []
         self.blender_object = ""
         self.anims = []
+        self.is_joint = False
 
     def read(self):
         if 'name' in self.json.keys():
@@ -55,6 +56,9 @@ class Node():
             self.mesh = Mesh(self.json['mesh'], self.gltf.json['meshes'][self.json['mesh']], self.gltf)
             self.mesh.read()
             self.mesh.debug_missing()
+
+            if 'skin' in self.json.keys():
+                self.mesh.rig(self.json['skin'])
 
         if 'camera' in self.json.keys():
             self.camera = Camera(self.json['camera'], self.name, self.gltf.json['cameras'][self.json['camera']], self.gltf)
@@ -82,7 +86,6 @@ class Node():
         s = mat_input.to_scale()
         rotation = mat_input.to_quaternion()
         location = mat_input.to_translation()
-        print(mat_input.to_euler())
 
         mat = Matrix([
             [s[0], 0, 0, 0],
@@ -354,6 +357,9 @@ class Node():
             return
 
 
+        if self.is_joint:
+            return #TODO bones
+
         # No mesh, no camera. For now, create empty #TODO
 
         if self.name:
@@ -379,7 +385,8 @@ class Node():
                 'rotation',
                 'scale',
                 'children',
-                'camera'
+                'camera',
+                'skin'
                 ]
 
         for key in self.json.keys():

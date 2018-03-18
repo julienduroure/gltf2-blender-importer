@@ -48,6 +48,7 @@ class glTFImporter():
 
         self.buffers = {}
         self.materials = {}
+        self.skins = {}
 
         self.load()
 
@@ -158,12 +159,34 @@ class glTFImporter():
                 animation.read()
                 animation.debug_missing()
 
+        # Set bone type on all joints
+        for node in self.scene.nodes.values():
+            is_joint, skin = self.is_node_joint(node.index)
+            if is_joint:
+                node.is_joint = True
+                node.skin     = skin # Reference to skin
+
+        for scene in self.other_scenes:
+            for node in scene.nodes.values():
+                is_joint, skin = self.is_node_joint(node.index)
+                if is_joint:
+                    node.is_joint = True
+                    node.skin     = skin # Reference to skin
+
     def get_node(self, node_id):
         if node_id in self.scene.nodes.keys():
             return self.scene.nodes[node_id]
         for scene in self.other_scenes:
             if node_id in scene.nodes.keys():
                 return scene.nodes[node_id]
+
+    def is_node_joint(self, node_id):
+        is_joint = False
+        for skin in self.skins.values():
+            if node_id in skin.bones:
+                return True, skin.index
+
+        return is_joint, None
 
 
     def blender_create(self):
@@ -184,7 +207,8 @@ class glTFImporter():
                 'buffers',
                 'materials',
                 'animations',
-                'cameras'
+                'cameras',
+                'skins'
                 ]
 
         for key in self.json.keys():

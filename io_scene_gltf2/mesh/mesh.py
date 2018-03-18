@@ -21,6 +21,7 @@
  """
 
 from .primitive import *
+from ..rig import *
 
 class Mesh():
     def __init__(self, index, json, gltf):
@@ -49,6 +50,15 @@ class Mesh():
         if 'weights' in self.json.keys():
             for weight in self.json['weights']:
                 self.target_weights.append(weight)
+
+    def rig(self, skin_id):
+        if skin_id not in self.gltf.skins.keys():
+            self.skin = Skin(skin_id, self.gltf.json['skins'][skin_id], self.gltf)
+            self.gltf.skins[skin_id] = self.skin
+            self.skin.read()
+            self.skin.debug_missing()
+        else:
+            self.skin = self.gltf.skins[skin_id]
 
     def debug_missing(self):
         keys = [
