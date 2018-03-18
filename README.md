@@ -12,7 +12,6 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
 # What will NOT work (for now, until I implement it)  
 *  materials (there are only created, but no data on it)
 *  textures
-*  sparse data
 *  rigging data (no joins, no skinning)
 
 # What should work  
@@ -21,7 +20,7 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
     *  gltf  
         *  with external uri  
         *  with embeded data  
-*  geometry (if there is no sparse data)
+*  geometry
 *  children management
 *  Morph (shapekeys)
 *  animations  
