@@ -69,13 +69,32 @@ class Node():
     def set_anim(self, channel):
         self.anims.append(channel)
 
-    def convert_matrix(self, mat):
-        mat =  Matrix([mat[0:4], mat[4:8], mat[8:12], mat[12:16]])
-        mat.transpose()
+    def convert_matrix(self, mat_input):
+        mat_input =  Matrix([mat_input[0:4], mat_input[4:8], mat_input[8:12], mat_input[12:16]])
+        mat_input.transpose()
+
+        s = mat_input.to_scale()
+        rotation = mat_input.to_quaternion()
+        location = mat_input.to_translation()
+        print(mat_input.to_euler())
+
+        mat = Matrix([
+            [s[0], 0, 0, 0],
+            [0, s[1], 0, 0],
+            [0, 0, s[2], 0],
+            [0, 0, 0, 1]
+        ])
+
+        mat = self.convert_matrix_quaternion(rotation).to_matrix().to_4x4() * mat
+        mat = Matrix.Translation(Vector(self.convert_location(location))) * mat
+
         return mat
 
     def convert_quaternion(self, q):
         return Quaternion([q[3], q[0], -q[2], q[1]])
+
+    def convert_matrix_quaternion(self, q):
+        return Quaternion([q[0], q[1], -q[3], q[2]])
 
     def convert_location(self, location):
         return [location[0], -location[2], location[1]]
