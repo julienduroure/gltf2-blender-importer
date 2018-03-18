@@ -35,6 +35,15 @@ class Material():
             self.name = self.json['name']
         else:
             self.name = "Material_" + str(self.index)
-            
+
         mat = bpy.data.materials.new(self.name)
         self.blender_material = mat.name
+
+    def debug_missing(self):
+        keys = [
+
+                ]
+
+        for key in self.json.keys():
+            if key not in keys:
+                print("MATERIAL MISSING " + key)

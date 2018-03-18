@@ -37,6 +37,9 @@ class Sampler():
         input_data  = self.input.read()
         output_data = self.output.read()
 
+        self.input.debug_missing()
+        self.output.debug_missing()
+
         anim_data = []
 
         if self.channels == 0:
@@ -58,3 +61,14 @@ class Sampler():
                 anim_data.append(anim_data_chan)
 
             return anim_data
+
+    def debug_missing(self):
+        keys = [
+                'input',
+                'output',
+                'interpolation'
+                ]
+
+        for key in self.json.keys():
+            if key not in keys:
+                print("SAMPLER CHANNEL MISSING " + key)

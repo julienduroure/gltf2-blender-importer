@@ -60,6 +60,7 @@ class Accessor():
         if 'sparse' in self.json.keys():
             self.sparse = Sparse(self.json['componentType'], self.json['type'], self.json['sparse'], self.gltf)
             self.sparse.read()
+            self.sparse.debug_missing()
             self.data = self.bufferView.read_data(fmt, stride, self.json['count'], offset)
             self.apply_sparse()
             return self.data

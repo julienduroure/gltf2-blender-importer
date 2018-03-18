@@ -81,3 +81,14 @@ class Sparse():
                 offset = 0
 
             self.data = self.bufferView.read_data(fmt, stride, self.count, offset)
+
+    def debug_missing(self):
+        keys = [
+                'values',
+                'indices',
+                'count'
+                ]
+
+        for key in self.json.keys():
+            if key not in keys:
+                print("SPARSE MISSING " + key)

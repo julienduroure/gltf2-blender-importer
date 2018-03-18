@@ -45,4 +45,16 @@ class AnimChannel():
                     channels = len(prim.targets)
         self.sampler = Sampler(self.json['sampler'], self.anim.json['samplers'][self.json['sampler']], self.gltf, channels)
         self.data = self.sampler.read()
+        self.sampler.debug_missing()
         self.interpolation = self.sampler.interpolation
+
+
+    def debug_missing(self):
+        keys = [
+                'sampler',
+                'target'
+                ]
+
+        for key in self.json.keys():
+            if key not in keys:
+                print("ANIMATION CHANNEL MISSING " + key)

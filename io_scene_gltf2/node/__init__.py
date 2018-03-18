@@ -26,6 +26,7 @@ import bmesh
 from mathutils import Matrix, Vector, Quaternion
 
 from ..mesh import *
+from ..camera import *
 
 class Node():
     def __init__(self, index, json, gltf, root, scene):

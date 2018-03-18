@@ -156,6 +156,7 @@ class glTFImporter():
             for anim in self.json['animations']:
                 animation = Animation(anim_idx, self.json['animations'][anim_idx], self)
                 animation.read()
+                animation.debug_missing()
 
     def get_node(self, node_id):
         if node_id in self.scene.nodes.keys():
