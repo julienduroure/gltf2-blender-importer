@@ -69,7 +69,9 @@ class Node():
         self.anims.append(channel)
 
     def convert_matrix(self, mat):
-        return Matrix([mat[0:4], mat[4:8], mat[8:12], mat[12:16]]).transpose() #TODO to be tested
+        mat =  Matrix([mat[0:4], mat[4:8], mat[8:12], mat[12:16]])
+        mat.transpose()
+        return mat
 
     def convert_quaternion(self, q):
         return Quaternion([q[3], q[0], -q[2], q[1]])
