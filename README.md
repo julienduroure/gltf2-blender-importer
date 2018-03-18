@@ -16,17 +16,17 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
 *  rigging data (no joins, no skinning)
 
 # What should work  
-*  files
-  *  glb
-  *  gltf
-    *  with external uri
-    *  with embeded data
+*  files  
+    *  glb  
+    *  gltf  
+        *  with external uri  
+        *  with embeded data  
 *  geometry (if there is no sparse data)
 *  children management
 *  Morph (shapekeys)
 *  animations  
-  *  node animations
-  *  morph animations (shapekeys)
+    *  node animations  
+    *  morph animations (shapekeys)  
 
 # Thanks
 
