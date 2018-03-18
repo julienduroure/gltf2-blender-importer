@@ -22,6 +22,7 @@
 
 import struct
 from .bufferview import *
+from .sparse import *
 
 
 class Accessor():
@@ -56,7 +57,21 @@ class Accessor():
         else:
             offset = 0
 
-        return self.bufferView.read_data(fmt, stride, self.json['count'], offset)
+        if 'sparse' in self.json.keys():
+            self.sparse = Sparse(self.json['componentType'], self.json['type'], self.json['sparse'], self.gltf)
+            self.sparse.read()
+            self.data = self.bufferView.read_data(fmt, stride, self.json['count'], offset)
+            self.apply_sparse()
+            return self.data
+
+        else:
+            return self.bufferView.read_data(fmt, stride, self.json['count'], offset)
+
+    def apply_sparse(self):
+        cpt_idx = 0
+        for idx in self.sparse.indices:
+            self.data[idx[0]] = self.sparse.data[cpt_idx]
+            cpt_idx += 1
 
     def debug_missing(self):
         keys = [
@@ -67,7 +82,8 @@ class Accessor():
                 'byteOffset',
                 'min', #TODO :  add some checks ?
                 'max', #TODO :  add some checks ?
-                'name'
+                'name',
+                'sparse'
                 ]
 
         for key in self.json.keys():
