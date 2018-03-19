@@ -31,7 +31,7 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
 # Thanks
 
 Sources of inspiration / technical stuff:  
-*  [Khronos glTF2 blender exporter](1)
+*  [Khronos glTF2 blender exporter][1]
 *  [another gltf2 importer for blender][2]
 *  [Overwiew of specification][3]
 *  [glTF2 samples][4]
