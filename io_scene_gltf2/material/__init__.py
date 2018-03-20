@@ -21,3 +21,4 @@
  """
 
 from .material import *
+from .pbr import *

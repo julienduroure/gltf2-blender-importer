@@ -21,27 +21,44 @@
  """
 
 import bpy
+from .pbr import *
 
 class Material():
     def __init__(self, index, json, gltf):
         self.index = index
         self.json = json # Material json
         self.gltf = gltf # Reference to global glTF instance
+        self.name = None
 
         self.blender_material = None
 
-    def create_blender(self):
-        if 'name' in self.json:
+    def read(self):
+        if 'name' in self.json.keys():
             self.name = self.json['name']
-        else:
-            self.name = "Material_" + str(self.index)
 
-        mat = bpy.data.materials.new(self.name)
+        if 'pbrMetallicRoughness' in self.json.keys():
+            self.pbr = Pbr(self.json['pbrMetallicRoughness'], self.gltf)
+        else:
+            self.pbr = Pbr(None, self.gltf)
+        self.pbr.read()
+        self.pbr.debug_missing()
+
+    def create_blender(self):
+        if self.name is not None:
+            name = self.name
+        else:
+            name = "Material_" + str(self.index)
+
+        mat = bpy.data.materials.new(name)
         self.blender_material = mat.name
+
+        # create pbr material
+        self.pbr.create_blender(mat.name)
 
     def debug_missing(self):
         keys = [
-
+                'name',
+                'pbrMetallicRoughness'
                 ]
 
         for key in self.json.keys():

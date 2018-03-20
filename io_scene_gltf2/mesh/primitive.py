@@ -58,6 +58,8 @@ class Primitive():
             # create material if not alreadt exits
             if self.json['material'] not in self.gltf.materials.keys():
                 self.mat = Material(self.json['material'], self.gltf.json['materials'][self.json['material']], self.gltf)
+                self.mat.read()
+                self.mat.debug_missing()
                 self.gltf.materials[self.json['material']] = self.mat
             else:
                 # Use already existing material
