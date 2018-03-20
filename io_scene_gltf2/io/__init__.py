@@ -54,8 +54,6 @@ class glTFImporter():
 
         self.blender = BlenderData()
 
-        # TODO check version
-
         self.fmt_char_dict = {}
         self.fmt_char_dict[5120] = 'b' # Byte
         self.fmt_char_dict[5121] = 'B' # Unsigned Byte
@@ -128,14 +126,29 @@ class glTFImporter():
             return self.json['scene'], self.json['scenes'][self.json['scene']]
         return 0, self.json['scenes'][0]
 
+    def check_version(self):
+        if not 'asset' in self.json.keys():
+            return False, "No asset data in json"
+
+        if not 'version' in self.json['asset']:
+            return False, "No version data in json asset"
+
+        if self.json['asset']['version'] != "2.0":
+            return False, "glTF version must be 2.0"
+
+        return True, None
+
 
     def read(self):
 
-        idx, scene = self.get_root_scene()
-        self.scene = Scene(idx, scene, self)
-        if not scene:
-            print("Error reading root scene")
+        check_version, txt = self.check_version()
+        if not check_version:
+            return False, txt
 
+        idx, scene = self.get_root_scene()
+        if not scene:
+            return False, "Error reading root scene"
+        self.scene = Scene(idx, scene, self)
         self.scene.read()
         self.scene.debug_missing()
 
@@ -172,6 +185,8 @@ class glTFImporter():
                 if is_joint:
                     node.is_joint = True
                     node.skin     = skin # Reference to skin
+
+        return True, None # Success
 
     def get_node(self, node_id):
         if node_id in self.scene.nodes.keys():

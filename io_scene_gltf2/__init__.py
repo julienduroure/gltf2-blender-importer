@@ -48,7 +48,10 @@ class ImportglTF2(Operator, ImportHelper):
 
     def import_gltf2(self, context):
         self.gltf = glTFImporter(self.filepath)
-        self.gltf.read()
+        success, txt = self.gltf.read()
+        if not success:
+            self.report({'ERROR'}, txt)
+            return {'CANCELLED'}
         self.gltf.blender_create()
         self.gltf.debug_missing()
 
