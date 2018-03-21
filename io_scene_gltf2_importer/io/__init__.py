@@ -48,6 +48,7 @@ class glTFImporter():
 
         self.buffers = {}
         self.materials = {}
+        self.default_material = None
         self.skins = {}
 
         self.load()

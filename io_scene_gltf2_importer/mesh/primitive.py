@@ -65,6 +65,15 @@ class Primitive():
                 # Use already existing material
                 self.mat = self.gltf.materials[self.json['material']]
 
+        else:
+            # No material, use default one
+            if self.gltf.default_material is None:
+                self.gltf.default_material = Material(None, None, self.gltf)
+                self.gltf.default_material.read()
+                self.gltf.default_material.debug_missing()
+
+            self.mat = self.gltf.default_material
+
         # reading targets (shapekeys) if any
         if 'targets' in self.json.keys():
             for targ in self.json['targets']:

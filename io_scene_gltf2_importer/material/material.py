@@ -33,6 +33,16 @@ class Material():
         self.blender_material = None
 
     def read(self):
+
+        # If no index, this is the default material
+        if self.index is None:
+            self.pbr = Pbr(None, self.gltf)
+            self.pbr.read()
+            self.pbr.debug_missing()
+            self.name = "Default Material"
+            return
+
+        # Not default material
         if 'name' in self.json.keys():
             self.name = self.json['name']
 
@@ -56,6 +66,8 @@ class Material():
         self.pbr.create_blender(mat.name)
 
     def debug_missing(self):
+        if self.index is None:
+            return
         keys = [
                 'name',
                 'pbrMetallicRoughness'

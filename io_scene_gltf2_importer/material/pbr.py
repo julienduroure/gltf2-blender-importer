@@ -83,6 +83,8 @@ class Pbr():
         node_tree.links.new(output_node.inputs[0], principled.outputs[0])
 
     def debug_missing(self):
+        if self.json is None:
+            return
         keys = [
                 'baseColorFactor',
                 'metallicFactor',
