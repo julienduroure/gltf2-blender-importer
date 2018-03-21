@@ -27,6 +27,7 @@ class Pbr():
 
     SIMPLE  = 1
     TEXTURE = 2
+    TEXTURE_FACTOR = 3
 
     def __init__(self, json, gltf):
         self.json = json # pbrMetallicRoughness json
@@ -61,6 +62,8 @@ class Pbr():
 
         if 'baseColorFactor' in self.json.keys():
             self.baseColorFactor = self.json['baseColorFactor']
+            if self.type == self.TEXTURE:
+                self.type == self.TEXTURE_FACTOR
 
         if 'metallicFactor' in self.json.keys():
             self.metallicFactor = self.json['metallicFactor']
@@ -100,11 +103,31 @@ class Pbr():
 
         elif self.type == self.TEXTURE:
 
+            #TODO alpha ?
+
             self.baseColorTexture.blender_create()
 
-            # create UV Map / Mapping / Texture nodes
+            # create UV Map / Mapping / Texture nodes / separate & math and combine
             text_node = node_tree.nodes.new('ShaderNodeTexImage')
             text_node.image = bpy.data.images[self.baseColorTexture.image.blender_image_name]
+
+            combine = node_tree.nodes.new('ShaderNodeCombineRGB')
+
+            math_R  = node_tree.nodes.new('ShaderNodeMath')
+            math_R.operation = 'MULTIPLY'
+            math_R.inputs[1].default_value = self.baseColorFactor[0]
+
+            math_G  = node_tree.nodes.new('ShaderNodeMath')
+            math_G.operation = 'MULTIPLY'
+            math_G.inputs[1].default_value = self.baseColorFactor[1]
+
+            math_B  = node_tree.nodes.new('ShaderNodeMath')
+            math_B.operation = 'MULTIPLY'
+            math_B.inputs[1].default_value = self.baseColorFactor[2]
+
+            # TODO alpha ?
+
+            separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
 
             mapping = node_tree.nodes.new('ShaderNodeMapping')
 
@@ -114,7 +137,19 @@ class Pbr():
             # Create links
             node_tree.links.new(mapping.inputs[0], uvmap.outputs[0])
             node_tree.links.new(text_node.inputs[0], mapping.outputs[0])
-            node_tree.links.new(principled.inputs[0], text_node.outputs[0])
+            node_tree.links.new(separate.inputs[0], text_node.outputs[0])
+            node_tree.links.new(math_R.inputs[0], separate.outputs[0])
+            node_tree.links.new(math_G.inputs[0], separate.outputs[1])
+            node_tree.links.new(math_B.inputs[0], separate.outputs[2])
+            node_tree.links.new(combine.inputs[0], math_R.outputs[0])
+            node_tree.links.new(combine.inputs[1], math_G.outputs[0])
+            node_tree.links.new(combine.inputs[2], math_B.outputs[0])
+            node_tree.links.new(principled.inputs[0], combine.outputs[0])
+
+        elif self.type == self.TEXTURE_FACTOR:
+            self.baseColorTexture.blender_create()
+
+
 
         # link node to output
         node_tree.links.new(output_node.inputs[0], principled.outputs[0])
