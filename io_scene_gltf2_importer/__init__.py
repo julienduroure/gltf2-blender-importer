@@ -34,7 +34,7 @@ bl_info = {
     "blender": (2, 79, 0),
     "description": "Blender glTF2 importer",
     "location": "File > Import",
-    "category": "Import/Export"
+    "category": "Import-Export"
 }
 
 #TODO reloading stuff
