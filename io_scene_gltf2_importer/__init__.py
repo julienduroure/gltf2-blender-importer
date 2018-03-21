@@ -40,7 +40,7 @@ bl_info = {
 #TODO reloading stuff
 
 class ImportglTF2(Operator, ImportHelper):
-    bl_idname = 'import.gltf2'
+    bl_idname = 'import_scene.gltf2'
     bl_label  = "Import glTF2"
 
     def execute(self, context):
