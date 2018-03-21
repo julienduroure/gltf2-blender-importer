@@ -36,8 +36,6 @@ class Buffer():
 
         self.length = self.json['byteLength']
 
-        # TODO data:
-
         if 'uri' in self.json.keys():
             sep = ';base64,'
             if self.json['uri'][:5] == 'data:':

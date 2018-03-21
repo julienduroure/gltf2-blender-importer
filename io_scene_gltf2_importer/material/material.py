@@ -65,6 +65,12 @@ class Material():
         # create pbr material
         self.pbr.create_blender(mat.name)
 
+    def set_uvmap(self, prim, obj):
+        node_tree = bpy.data.materials[self.blender_material].node_tree
+        uvmap_node =  [node for node in node_tree.nodes if node.type == 'UVMAP'][0]
+        print(prim.blender_texcoord)
+        uvmap_node.uv_map = prim.blender_texcoord[self.pbr.texCoord]
+
     def debug_missing(self):
         if self.index is None:
             return

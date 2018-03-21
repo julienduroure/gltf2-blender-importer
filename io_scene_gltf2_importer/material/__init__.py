@@ -22,3 +22,5 @@
 
 from .material import *
 from .pbr import *
+from .texture import *
+from .image import *

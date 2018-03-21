@@ -29,7 +29,8 @@ class Primitive():
         self.gltf = gltf # Reference to global glTF instance
         self.attributes = {}
         self.mat = None
-        self.targets = []
+        self.targets = [] # shapekeys
+        self.blender_texcoord = {}
 
     def read(self):
 
@@ -95,7 +96,9 @@ class Primitive():
 
         keys_attr = [
                 'POSITION',
-                'NORMAL'
+                'NORMAL',
+                'TEXCOORD_0',
+                'TEXCOORD_1'
         ]
 
         for key in self.json.keys():

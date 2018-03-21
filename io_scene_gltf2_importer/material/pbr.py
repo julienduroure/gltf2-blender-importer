@@ -21,11 +21,18 @@
  """
 
 import bpy
+from .texture import *
 
 class Pbr():
+
+    SIMPLE  = 1
+    TEXTURE = 2
+
     def __init__(self, json, gltf):
         self.json = json # pbrMetallicRoughness json
         self.gltf = gltf # Reference to global glTF instance
+
+        self.type = self.SIMPLE
 
         # Default values
         self.baseColorFactor = [1,1,1,1]
@@ -40,7 +47,17 @@ class Pbr():
         if self.json is None:
             return # will use default values
 
-        # TODO : no texture mode for now
+        if 'baseColorTexture' in self.json.keys():
+            self.type = self.TEXTURE
+            self.baseColorTexture = Texture(self.json['baseColorTexture']['index'], self.gltf.json['textures'][self.json['baseColorTexture']['index']], self.gltf)
+            self.baseColorTexture.read()
+            self.baseColorTexture.debug_missing()
+
+            if 'texCoord' in self.json['baseColorTexture']:
+                self.texCoord = int(self.json['baseColorTexture']['texCoord'])
+            else:
+                self.texCoord = 0
+
 
         if 'baseColorFactor' in self.json.keys():
             self.baseColorFactor = self.json['baseColorFactor']
@@ -73,11 +90,31 @@ class Pbr():
         # create PBR node
         principled = node_tree.nodes.new('ShaderNodeBsdfPrincipled')
 
-        # change input values
-        principled.inputs[0].default_value = self.baseColorFactor
-        principled.inputs[4].default_value = self.metallicFactor
-        principled.inputs[5].default_value = self.metallicFactor #TODO : currently set metallic & specular in same way
-        principled.inputs[7].default_value = self.roughnessFactor
+        if self.type == self.SIMPLE:
+
+            # change input values
+            principled.inputs[0].default_value = self.baseColorFactor
+            principled.inputs[4].default_value = self.metallicFactor
+            principled.inputs[5].default_value = self.metallicFactor #TODO : currently set metallic & specular in same way
+            principled.inputs[7].default_value = self.roughnessFactor
+
+        elif self.type == self.TEXTURE:
+
+            self.baseColorTexture.blender_create()
+
+            # create UV Map / Mapping / Texture nodes
+            text_node = node_tree.nodes.new('ShaderNodeTexImage')
+            text_node.image = bpy.data.images[self.baseColorTexture.image.blender_image_name]
+
+            mapping = node_tree.nodes.new('ShaderNodeMapping')
+
+            uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            # UV Map will be set after object/UVMap creation
+
+            # Create links
+            node_tree.links.new(mapping.inputs[0], uvmap.outputs[0])
+            node_tree.links.new(text_node.inputs[0], mapping.outputs[0])
+            node_tree.links.new(principled.inputs[0], text_node.outputs[0])
 
         # link node to output
         node_tree.links.new(output_node.inputs[0], principled.outputs[0])

@@ -262,8 +262,6 @@ class Node():
 
                 # manage material of primitive
                 if prim.mat:
-                    if not prim.mat.index in self.gltf.materials.keys():
-                        print("Error, material should exist")
 
                     # Create Blender material
                     if not prim.mat.blender_material:
@@ -290,7 +288,6 @@ class Node():
             self.blender_object = obj.name
             self.set_parent(obj, parent)
 
-
             # manage UV
             offset = 0
 
@@ -298,7 +295,7 @@ class Node():
                 for texcoord in [attr for attr in prim.attributes.keys() if attr[:9] == "TEXCOORD_"]:
                     if not texcoord in mesh.uv_textures:
                         mesh.uv_textures.new(texcoord)
-
+                        prim.blender_texcoord[int(texcoord[9:])] = texcoord
 
                     for poly in mesh.polygons:
                         for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
@@ -309,6 +306,11 @@ class Node():
                 offset = offset + prim.vertices_length
 
             mesh.update()
+
+            # Object and UV are now created, we can set UVMap into material
+            for prim in self.mesh.primitives:
+                if prim.mat.pbr.type == prim.mat.pbr.TEXTURE:
+                    prim.mat.set_uvmap(prim, obj)
 
             # Assign materials to mesh
             offset = 0

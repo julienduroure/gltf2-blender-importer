@@ -50,6 +50,7 @@ class glTFImporter():
         self.materials = {}
         self.default_material = None
         self.skins = {}
+        self.images = {}
 
         self.load()
 
@@ -224,7 +225,9 @@ class glTFImporter():
                 'materials',
                 'animations',
                 'cameras',
-                'skins'
+                'skins',
+                'textures',
+                'images'
                 ]
 
         for key in self.json.keys():
