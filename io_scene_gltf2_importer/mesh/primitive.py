@@ -86,7 +86,7 @@ class Primitive():
 
         keys_attr = [
                 'POSITION',
-				'NORMAL'
+                'NORMAL'
         ]
 
         for key in self.json.keys():

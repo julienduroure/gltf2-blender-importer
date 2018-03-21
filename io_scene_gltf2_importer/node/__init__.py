@@ -247,7 +247,9 @@ class Node():
             faces = []
             for prim in self.mesh.primitives:
                 current_length = len(verts)
-                verts.extend([self.convert_location(vert) for vert in prim.attributes['POSITION']['result']])
+                prim_verts = [self.convert_location(vert) for vert in prim.attributes['POSITION']['result']]
+                prim.vertices_length = len(prim_verts)
+                verts.extend(prim_verts)
                 prim_faces = []
                 for i in range(0, len(prim.indices), 3):
                     vals = prim.indices[i:i+3]
@@ -270,6 +272,8 @@ class Node():
             mesh.from_pydata(verts, edges, faces)
             mesh.validate()
 
+
+
             cpt_vert = 0
             for prim in self.mesh.primitives:
                 if 'NORMAL' in prim.attributes.keys():
@@ -286,6 +290,25 @@ class Node():
             self.blender_object = obj.name
             self.set_parent(obj, parent)
 
+
+            # manage UV
+            offset = 0
+
+            for prim in self.mesh.primitives:
+                for texcoord in [attr for attr in prim.attributes.keys() if attr[:9] == "TEXCOORD_"]:
+                    if not texcoord in mesh.uv_textures:
+                        mesh.uv_textures.new(texcoord)
+
+
+                    for poly in mesh.polygons:
+                        for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
+                            vert_idx = mesh.loops[loop_idx].vertex_index
+                            if vert_idx in range(offset, offset + prim.vertices_length):
+                                obj.data.uv_layers[texcoord].data[loop_idx].uv = Vector((prim.attributes[texcoord]['result'][vert_idx-offset][0], 1-prim.attributes[texcoord]['result'][vert_idx-offset][1]))
+
+                offset = offset + prim.vertices_length
+
+            mesh.update()
 
             # Assign materials to mesh
             offset = 0
@@ -340,7 +363,6 @@ class Node():
                     obj.data.shape_keys.key_blocks[i+1].value = self.mesh.target_weights[i]
                     if self.mesh.primitives[0].targets[i]['POSITION']['accessor'].name:
                        obj.data.shape_keys.key_blocks[i+1].name  = self.mesh.primitives[0].targets[i]['POSITION']['accessor'].name
-
 
             for child in self.children:
                 child.blender_create(self.index)
