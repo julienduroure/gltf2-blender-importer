@@ -84,6 +84,16 @@ class Primitive():
                 'targets'
                 ]
 
+        keys_attr = [
+                'POSITION',
+				'NORMAL'
+        ]
+
         for key in self.json.keys():
             if key not in keys:
                 print("PRIMITIVE MISSING " + key)
+
+        if 'attributes' in self.json.keys():
+            for attr in self.json['attributes'].keys():
+                if attr not in keys_attr:
+                    print("PRIMITIVE MISSING attribute " + attr)
