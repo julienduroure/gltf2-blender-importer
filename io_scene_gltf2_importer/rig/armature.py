@@ -20,6 +20,8 @@
  * ***** END GPL LICENSE BLOCK *****
  """
 
+import bpy
+from mathutils import Vector
 from ..buffer import *
 
 class Skin():
@@ -29,6 +31,7 @@ class Skin():
         self.gltf  = gltf # Reference to global glTF instance
         self.name  = None
         self.bones = []
+        self.blender_armature_name = None
 
     def read(self):
         if 'skeleton' in self.json.keys():
@@ -44,6 +47,42 @@ class Skin():
             self.inverseBindMatrices = Accessor(self.json['inverseBindMatrices'], self.gltf.json['accessors'][self.json['inverseBindMatrices']], self.gltf)
             self.data = self.inverseBindMatrices.read()
             self.inverseBindMatrices.debug_missing()
+
+    def create_blender(self):
+        if self.name is not None:
+            name = self.name
+        else:
+            name = "Armature_" + str(self.index)
+
+        armature = bpy.data.armatures.new(name)
+        obj = bpy.data.objects.new(name, armature)
+        bpy.data.scenes[self.gltf.blender.scene].objects.link(obj)
+        self.blender_armature_name = obj.name
+
+    def create_bone(self, node, parent):
+        scene = bpy.data.scenes[self.gltf.blender.scene]
+        obj   = bpy.data.objects[self.blender_armature_name]
+
+        bpy.context.screen.scene = scene
+        scene.objects.active = obj
+        bpy.ops.object.mode_set(mode="EDIT")
+
+        if node.name:
+            name = node.name
+        else:
+            name = "Bone_" + str(node.index)
+
+        bone = obj.data.edit_bones.new(name)
+        node.blender_bone_name = bone.name
+        # Need to set head & tail locations to keep this bone alive
+        bone.head = Vector((0.0,0.0,0.0)) # TODO get transformations
+        bone.tail = Vector((0.0,0.0,1.0)) # TODO get transformations
+
+        # Set parent
+        if parent is not None and hasattr(self.gltf.scene.nodes[parent], "blender_bone_name"):
+            bone.parent = obj.data.edit_bones[self.gltf.scene.nodes[parent].blender_bone_name] #TODO if in another scene
+
+        bpy.ops.object.mode_set(mode="OBJECT")
 
     def debug_missing(self):
         keys = [

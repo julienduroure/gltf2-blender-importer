@@ -179,14 +179,14 @@ class glTFImporter():
             is_joint, skin = self.is_node_joint(node.index)
             if is_joint:
                 node.is_joint = True
-                node.skin     = skin # Reference to skin
+                node.skin_id     = skin
 
         for scene in self.other_scenes:
             for node in scene.nodes.values():
                 is_joint, skin = self.is_node_joint(node.index)
                 if is_joint:
                     node.is_joint = True
-                    node.skin     = skin # Reference to skin
+                    node.skin_id     = skin
 
         return True, None # Success
 

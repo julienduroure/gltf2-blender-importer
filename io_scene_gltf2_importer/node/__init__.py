@@ -226,6 +226,14 @@ class Node():
 
     def blender_create(self, parent):
         if self.mesh:
+
+            # Check if the mesh is rigged, and create armature if needed
+            if self.mesh.skin:
+                if self.mesh.skin.blender_armature_name is None:
+                    # Create empty armature for now
+                    self.mesh.skin.create_blender()
+
+            # Geometry
             if self.mesh.name:
                 mesh_name = self.mesh.name
             else:
@@ -405,7 +413,16 @@ class Node():
 
 
         if self.is_joint:
-            return #TODO bones
+            # Check if corresponding armature is already created, create it if needed
+            if self.gltf.skins[self.skin_id].blender_armature_name is None:
+                self.gltf.skins[self.skin_id].create_blender()
+
+            self.gltf.skins[self.skin_id].create_bone(self, parent)
+
+            for child in self.children:
+                child.blender_create(self.index)
+
+            return
 
         # No mesh, no camera. For now, create empty #TODO
 
