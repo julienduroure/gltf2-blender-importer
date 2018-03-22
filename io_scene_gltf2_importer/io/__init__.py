@@ -227,7 +227,8 @@ class glTFImporter():
                 'cameras',
                 'skins',
                 'textures',
-                'images'
+                'images',
+                'asset'
                 ]
 
         for key in self.json.keys():

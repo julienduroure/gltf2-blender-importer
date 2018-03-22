@@ -208,7 +208,8 @@ class Pbr():
         keys = [
                 'baseColorFactor',
                 'metallicFactor',
-                'roughnessFactor'
+                'roughnessFactor',
+                'baseColorTexture'
                 ]
 
         for key in self.json.keys():
