@@ -34,6 +34,7 @@ class Pbr():
         self.gltf = gltf # Reference to global glTF instance
 
         self.type = self.SIMPLE
+        self.vertex_color = False
 
         # Default values
         self.baseColorFactor = [1,1,1,1]
@@ -121,7 +122,20 @@ class Pbr():
         elif self.type == self.TEXTURE:
 
             #TODO alpha ?
-            #TODO COLOR_0 if any
+            if self.vertex_color:
+                # Create attribute / separate / math nodes
+                attribute_node = node_tree.nodes.new('ShaderNodeAttribute')
+                attribute_node.attribute_name = 'COLOR_0'
+
+                separate_vertex_color = node_tree.nodes.new('ShaderNodeSeparateRGB')
+                math_vc_R = node_tree.nodes.new('ShaderNodeMath')
+                math_vc_R.operation = 'MULTIPLY'
+
+                math_vc_G = node_tree.nodes.new('ShaderNodeMath')
+                math_vc_G.operation = 'MULTIPLY'
+
+                math_vc_B = node_tree.nodes.new('ShaderNodeMath')
+                math_vc_B.operation = 'MULTIPLY'
 
             self.baseColorTexture.blender_create()
 
@@ -153,21 +167,37 @@ class Pbr():
             # UV Map will be set after object/UVMap creation
 
             # Create links
-            node_tree.links.new(mapping.inputs[0], uvmap.outputs[0])
-            node_tree.links.new(text_node.inputs[0], mapping.outputs[0])
-            node_tree.links.new(separate.inputs[0], text_node.outputs[0])
+            if self.vertex_color:
+                node_tree.links.new(separate_vertex_color.inputs[0], attribute_node.outputs[0])
+                node_tree.links.new(math_vc_R.inputs[1], separate_vertex_color.outputs[0])
+                node_tree.links.new(math_vc_G.inputs[1], separate_vertex_color.outputs[1])
+                node_tree.links.new(math_vc_B.inputs[1], separate_vertex_color.outputs[2])
+                node_tree.links.new(math_vc_R.inputs[0], math_R.outputs[0])
+                node_tree.links.new(math_vc_G.inputs[0], math_G.outputs[0])
+                node_tree.links.new(math_vc_B.inputs[0], math_B.outputs[0])
+                node_tree.links.new(combine.inputs[0], math_vc_R.outputs[0])
+                node_tree.links.new(combine.inputs[1], math_vc_G.outputs[0])
+                node_tree.links.new(combine.inputs[2], math_vc_B.outputs[0])
+
+            else:
+                node_tree.links.new(combine.inputs[0], math_R.outputs[0])
+                node_tree.links.new(combine.inputs[1], math_G.outputs[0])
+                node_tree.links.new(combine.inputs[2], math_B.outputs[0])
+
+            # Common for both mode (non vertex color / vertex color)
             node_tree.links.new(math_R.inputs[0], separate.outputs[0])
             node_tree.links.new(math_G.inputs[0], separate.outputs[1])
             node_tree.links.new(math_B.inputs[0], separate.outputs[2])
-            node_tree.links.new(combine.inputs[0], math_R.outputs[0])
-            node_tree.links.new(combine.inputs[1], math_G.outputs[0])
-            node_tree.links.new(combine.inputs[2], math_B.outputs[0])
+
+            node_tree.links.new(mapping.inputs[0], uvmap.outputs[0])
+            node_tree.links.new(text_node.inputs[0], mapping.outputs[0])
+            node_tree.links.new(separate.inputs[0], text_node.outputs[0])
+
+
             node_tree.links.new(principled.inputs[0], combine.outputs[0])
 
         elif self.type == self.TEXTURE_FACTOR:
             self.baseColorTexture.blender_create()
-
-
 
         # link node to output
         node_tree.links.new(output_node.inputs[0], principled.outputs[0])
