@@ -75,12 +75,12 @@ class Pbr():
         if 'baseColorFactor' in self.json.keys():
             self.baseColorFactor = self.json['baseColorFactor']
             if self.color_type == self.TEXTURE:
-                self.color_type == self.TEXTURE_FACTOR
+                self.color_type = self.TEXTURE_FACTOR
 
         if 'metallicFactor' in self.json.keys():
             self.metallicFactor = self.json['metallicFactor']
             if self.metallic_type == self.TEXTURE:
-                self.metallic_type == self.TEXTURE_FACTOR
+                self.metallic_type = self.TEXTURE_FACTOR
 
         if 'roughnessFactor' in self.json.keys():
             self.roughnessFactor = self.json['roughnessFactor']
