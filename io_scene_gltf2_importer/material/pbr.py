@@ -116,7 +116,6 @@ class Pbr():
 
                 # change input values
                 principled.inputs[0].default_value = self.baseColorFactor
-                principled.inputs[4].default_value = self.metallicFactor
                 principled.inputs[5].default_value = self.metallicFactor #TODO : currently set metallic & specular in same way
                 principled.inputs[7].default_value = self.roughnessFactor
 
@@ -125,7 +124,6 @@ class Pbr():
                 attribute_node = node_tree.nodes.new('ShaderNodeAttribute')
                 attribute_node.attribute_name = 'COLOR_0'
 
-                principled.inputs[4].default_value = self.metallicFactor
                 principled.inputs[5].default_value = self.metallicFactor #TODO : currently set metallic & specular in same way
                 principled.inputs[7].default_value = self.roughnessFactor
 
@@ -281,6 +279,30 @@ class Pbr():
             node_tree.links.new(mapping.inputs[0], uvmap.outputs[0])
             node_tree.links.new(text_node.inputs[0], mapping.outputs[0])
 
+
+        if self.metallic_type == self.SIMPLE:
+            principled.inputs[4].default_value = self.metallicFactor
+
+        elif self.metallic_type == self.TEXTURE:
+            self.metallicRoughnessTexture.blender_create()
+            metallic_text = node_tree.nodes.new('ShaderNodeTexImage')
+            metallic_text.image = bpy.data.images[self.metallicRoughnessTexture.image.blender_image_name]
+
+            metallic_separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
+
+            metallic_mapping = node_tree.nodes.new('ShaderNodeMapping')
+
+            metallic_uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+
+            # links
+            node_tree.links.new(metallic_separate.inputs[0], metallic_text.outputs[0])
+            node_tree.links.new(principled.inputs[4], metallic_separate.outputs[2])
+
+            node_tree.links.new(metallic_mapping.inputs[0], metallic_uvmap.outputs[0])
+            node_tree.links.new(metallic_node.inputs[0], metallic_mapping.outputs[0])
+        else:
+            pass #TODO
+            print("metal + text + fact")
 
         # link node to output
         node_tree.links.new(output_node.inputs[0], principled.outputs[0])
