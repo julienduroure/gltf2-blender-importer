@@ -364,6 +364,27 @@ class Node():
                     if self.mesh.primitives[0].targets[i]['POSITION']['accessor'].name:
                        obj.data.shape_keys.key_blocks[i+1].name  = self.mesh.primitives[0].targets[i]['POSITION']['accessor'].name
 
+
+            # Apply vertex color.
+            # TODO : Only if there is no material. Because if there is a material, values are use in material
+            vertex_color = None
+            offset = 0
+            for prim in self.mesh.primitives:
+                if 'COLOR_0' in prim.attributes.keys():
+                    # Create vertex color, once only per object
+                    if vertex_color is None:
+                        vertex_color = obj.data.vertex_colors.new("COLOR_0")
+
+                    color_data = prim.attributes['COLOR_0']['result']
+
+                    for poly in mesh.polygons:
+                        for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
+                            vert_idx = mesh.loops[loop_idx].vertex_index
+                            if vert_idx in range(offset, offset + prim.vertices_length):
+                                vertex_color.data[loop_idx].color = color_data[vert_idx][0:3]
+                                #TODO : no alpha in vertex color
+                offset = offset + prim.vertices_length
+
             for child in self.children:
                 child.blender_create(self.index)
 
