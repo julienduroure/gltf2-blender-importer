@@ -33,8 +33,9 @@ class Pbr():
         self.json = json # pbrMetallicRoughness json
         self.gltf = gltf # Reference to global glTF instance
 
-        self.type = self.SIMPLE
+        self.color_type = self.SIMPLE
         self.vertex_color = False
+        self.metallic_type = self.SIMPLE
 
         # Default values
         self.baseColorFactor = [1,1,1,1]
@@ -50,7 +51,7 @@ class Pbr():
             return # will use default values
 
         if 'baseColorTexture' in self.json.keys():
-            self.type = self.TEXTURE
+            self.color_type = self.TEXTURE
             self.baseColorTexture = Texture(self.json['baseColorTexture']['index'], self.gltf.json['textures'][self.json['baseColorTexture']['index']], self.gltf)
             self.baseColorTexture.read()
             self.baseColorTexture.debug_missing()
@@ -60,14 +61,26 @@ class Pbr():
             else:
                 self.texCoord = 0
 
+        if 'metallicRoughnessTexture' in self.json.keys():
+            self.metallic_type = self.TEXTURE
+            self.metallicRoughnessTexture = Texture(self.json['metallicRoughnessTexture']['index'], self.gltf.json['textures'][self.json['metallicRoughnessTexture']['index']], self.gltf)
+            self.metallicRoughnessTexture.read()
+            self.metallicRoughnessTexture.debug_missing()
+
+            if 'texCoord' in self.json['metallicRoughnessTexture']:
+                self.texCoord = int(self.json['metallicRoughnessTexture']['texCoord'])
+            else:
+                self.texCoord = 0
 
         if 'baseColorFactor' in self.json.keys():
             self.baseColorFactor = self.json['baseColorFactor']
-            if self.type == self.TEXTURE:
-                self.type == self.TEXTURE_FACTOR
+            if self.color_type == self.TEXTURE:
+                self.color_type == self.TEXTURE_FACTOR
 
         if 'metallicFactor' in self.json.keys():
             self.metallicFactor = self.json['metallicFactor']
+            if self.metallic_type == self.TEXTURE:
+                self.metallic_type == self.TEXTURE_FACTOR
 
         if 'roughnessFactor' in self.json.keys():
             self.roughnessFactor = self.json['roughnessFactor']
@@ -97,7 +110,7 @@ class Pbr():
         # create PBR node
         principled = node_tree.nodes.new('ShaderNodeBsdfPrincipled')
 
-        if self.type == self.SIMPLE:
+        if self.color_type == self.SIMPLE:
 
             if not self.vertex_color:
 
@@ -119,7 +132,7 @@ class Pbr():
                 # links
                 node_tree.links.new(principled.inputs[0], attribute_node.outputs[1])
 
-        elif self.type == self.TEXTURE:
+        elif self.color_type == self.TEXTURE:
 
             #TODO alpha ?
             if self.vertex_color:
@@ -196,7 +209,7 @@ class Pbr():
 
             node_tree.links.new(principled.inputs[0], combine.outputs[0])
 
-        elif self.type == self.TEXTURE_FACTOR:
+        elif self.color_type == self.TEXTURE_FACTOR:
             self.baseColorTexture.blender_create()
 
         # link node to output
@@ -209,7 +222,8 @@ class Pbr():
                 'baseColorFactor',
                 'metallicFactor',
                 'roughnessFactor',
-                'baseColorTexture'
+                'baseColorTexture',
+                'metallicRoughnessTexture'
                 ]
 
         for key in self.json.keys():

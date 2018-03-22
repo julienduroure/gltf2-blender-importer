@@ -309,7 +309,7 @@ class Node():
 
             # Object and UV are now created, we can set UVMap into material
             for prim in self.mesh.primitives:
-                if prim.mat.pbr.type == prim.mat.pbr.TEXTURE:
+                if prim.mat.pbr.color_type in [prim.mat.pbr.TEXTURE, prim.mat.pbr.TEXTURE_FACTOR] :
                     prim.mat.set_uvmap(prim, obj)
 
             # Assign materials to mesh
