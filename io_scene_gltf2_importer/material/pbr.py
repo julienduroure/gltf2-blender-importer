@@ -132,7 +132,7 @@ class Pbr():
                 # links
                 node_tree.links.new(principled.inputs[0], attribute_node.outputs[1])
 
-        elif self.color_type == self.TEXTURE:
+        elif self.color_type == self.TEXTURE_FACTOR:
 
             #TODO alpha ?
             if self.vertex_color:
@@ -169,8 +169,6 @@ class Pbr():
             math_B  = node_tree.nodes.new('ShaderNodeMath')
             math_B.operation = 'MULTIPLY'
             math_B.inputs[1].default_value = self.baseColorFactor[2]
-
-            # TODO alpha ?
 
             separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
 
@@ -209,8 +207,80 @@ class Pbr():
 
             node_tree.links.new(principled.inputs[0], combine.outputs[0])
 
-        elif self.color_type == self.TEXTURE_FACTOR:
+        elif self.color_type == self.TEXTURE:
+
             self.baseColorTexture.blender_create()
+
+            #TODO alpha ?
+            if self.vertex_color:
+                # Create attribute / separate / math nodes
+                attribute_node = node_tree.nodes.new('ShaderNodeAttribute')
+                attribute_node.attribute_name = 'COLOR_0'
+
+                separate_vertex_color = node_tree.nodes.new('ShaderNodeSeparateRGB')
+                math_vc_R = node_tree.nodes.new('ShaderNodeMath')
+                math_vc_R.operation = 'MULTIPLY'
+
+                math_vc_G = node_tree.nodes.new('ShaderNodeMath')
+                math_vc_G.operation = 'MULTIPLY'
+
+                math_vc_B = node_tree.nodes.new('ShaderNodeMath')
+                math_vc_B.operation = 'MULTIPLY'
+
+
+                combine = node_tree.nodes.new('ShaderNodeCombineRGB')
+
+                math_R  = node_tree.nodes.new('ShaderNodeMath')
+                math_R.operation = 'MULTIPLY'
+                math_R.inputs[1].default_value = self.baseColorFactor[0]
+
+                math_G  = node_tree.nodes.new('ShaderNodeMath')
+                math_G.operation = 'MULTIPLY'
+                math_G.inputs[1].default_value = self.baseColorFactor[1]
+
+                math_B  = node_tree.nodes.new('ShaderNodeMath')
+                math_B.operation = 'MULTIPLY'
+                math_B.inputs[1].default_value = self.baseColorFactor[2]
+
+                separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
+
+            # create UV Map / Mapping / Texture nodes / separate & math and combine
+            text_node = node_tree.nodes.new('ShaderNodeTexImage')
+            text_node.image = bpy.data.images[self.baseColorTexture.image.blender_image_name]
+
+            mapping = node_tree.nodes.new('ShaderNodeMapping')
+
+            uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            # UV Map will be set after object/UVMap creation
+
+            # Create links
+            if self.vertex_color:
+                node_tree.links.new(separate_vertex_color.inputs[0], attribute_node.outputs[0])
+
+                node_tree.links.new(math_R.inputs[1], separate_vertex_color.outputs[0])
+                node_tree.links.new(math_G.inputs[1], separate_vertex_color.outputs[1])
+                node_tree.links.new(math_B.inputs[1], separate_vertex_color.outputs[2])
+
+                node_tree.links.new(combine.inputs[0], math_R.outputs[0])
+                node_tree.links.new(combine.inputs[1], math_G.outputs[0])
+                node_tree.links.new(combine.inputs[2], math_B.outputs[0])
+
+                node_tree.links.new(separate.inputs[0], text_node.outputs[0])
+
+                node_tree.links.new(math_R.inputs[0], separate.outputs[0])
+                node_tree.links.new(math_G.inputs[0], separate.outputs[1])
+                node_tree.links.new(math_B.inputs[0], separate.outputs[2])
+
+                node_tree.links.new(principled.inputs[0], combine.outputs[0])
+
+            else:
+                node_tree.links.new(principled.inputs[0], text_node.outputs[0])
+
+            # Common for both mode (non vertex color / vertex color)
+
+            node_tree.links.new(mapping.inputs[0], uvmap.outputs[0])
+            node_tree.links.new(text_node.inputs[0], mapping.outputs[0])
+
 
         # link node to output
         node_tree.links.new(output_node.inputs[0], principled.outputs[0])
