@@ -71,6 +71,9 @@ class Pbr():
         if 'roughnessFactor' in self.json.keys():
             self.roughnessFactor = self.json['roughnessFactor']
 
+    def use_vertex_color(self):
+        self.vertex_color = True
+
     def create_blender(self, mat_name):
         engine = bpy.context.scene.render.engine
         if engine == 'CYCLES':
@@ -95,15 +98,30 @@ class Pbr():
 
         if self.type == self.SIMPLE:
 
-            # change input values
-            principled.inputs[0].default_value = self.baseColorFactor
-            principled.inputs[4].default_value = self.metallicFactor
-            principled.inputs[5].default_value = self.metallicFactor #TODO : currently set metallic & specular in same way
-            principled.inputs[7].default_value = self.roughnessFactor
+            if not self.vertex_color:
+
+                # change input values
+                principled.inputs[0].default_value = self.baseColorFactor
+                principled.inputs[4].default_value = self.metallicFactor
+                principled.inputs[5].default_value = self.metallicFactor #TODO : currently set metallic & specular in same way
+                principled.inputs[7].default_value = self.roughnessFactor
+
+            else:
+                # Create attribute node to get COLOR_0 data
+                attribute_node = node_tree.nodes.new('ShaderNodeAttribute')
+                attribute_node.attribute_name = 'COLOR_0'
+
+                principled.inputs[4].default_value = self.metallicFactor
+                principled.inputs[5].default_value = self.metallicFactor #TODO : currently set metallic & specular in same way
+                principled.inputs[7].default_value = self.roughnessFactor
+
+                # links
+                node_tree.links.new(principled.inputs[0], attribute_node.outputs[1])
 
         elif self.type == self.TEXTURE:
 
             #TODO alpha ?
+            #TODO COLOR_0 if any
 
             self.baseColorTexture.blender_create()
 

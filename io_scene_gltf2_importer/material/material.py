@@ -53,6 +53,9 @@ class Material():
         self.pbr.read()
         self.pbr.debug_missing()
 
+    def use_vertex_color(self):
+        self.pbr.use_vertex_color()
+
     def create_blender(self):
         if self.name is not None:
             name = self.name

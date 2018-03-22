@@ -371,7 +371,6 @@ class Node():
 
 
             # Apply vertex color.
-            # TODO : Only if there is no material. Because if there is a material, values are use in material
             vertex_color = None
             offset = 0
             for prim in self.mesh.primitives:
