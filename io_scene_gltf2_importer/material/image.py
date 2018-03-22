@@ -25,6 +25,7 @@ import os
 import base64
 import tempfile
 from os.path import dirname, join
+from ..buffer import *
 
 class Image():
     def __init__(self, index, json, gltf):
@@ -35,6 +36,7 @@ class Image():
         self.blender_image_name = None
 
     def read(self):
+
         if 'uri' in self.json.keys():
             sep = ';base64,'
             if self.json['uri'][:5] == 'data:':
@@ -46,6 +48,18 @@ class Image():
 
             with open(join(dirname(self.gltf.filename), self.json['uri']), 'rb') as f_:
                 self.data = f_.read()
+                return
+
+        if 'bufferView' not in self.json.keys():
+            return
+
+        self.bufferView = BufferView(self.json['bufferView'], self.gltf.json['bufferViews'][self.json['bufferView']], self.gltf)
+        self.bufferView.read()
+        self.bufferView.debug_missing()
+
+        self.data = self.bufferView.read_binary_data()
+
+        return
 
     def blender_create(self):
         # Create a temp image, pack, and delete image

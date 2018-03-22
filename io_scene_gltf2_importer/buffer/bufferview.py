@@ -65,6 +65,16 @@ class BufferView():
 
         return data
 
+    def read_binary_data(self):
+        if 'byteOffset' in self.json.keys():
+            bufferview_offset = self.json['byteOffset']
+        else:
+            bufferview_offset = 0
+
+        length = self.json['byteLength']
+
+        return self.buffer.data[bufferview_offset:bufferview_offset + length]
+
 
     def debug_missing(self):
         keys = [
