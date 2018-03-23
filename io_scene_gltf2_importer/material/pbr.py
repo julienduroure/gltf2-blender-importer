@@ -299,10 +299,32 @@ class Pbr():
             node_tree.links.new(principled.inputs[4], metallic_separate.outputs[2])
 
             node_tree.links.new(metallic_mapping.inputs[0], metallic_uvmap.outputs[0])
-            node_tree.links.new(metallic_node.inputs[0], metallic_mapping.outputs[0])
-        else:
-            pass #TODO
-            print("metal + text + fact")
+            node_tree.links.new(metallic_text.inputs[0], metallic_mapping.outputs[0])
+
+        elif self.metallic_type == self.TEXTURE_FACTOR:
+
+            self.metallicRoughnessTexture.blender_create()
+
+            metallic_text = node_tree.nodes.new('ShaderNodeTexImage')
+            metallic_text.image = bpy.data.images[self.metallicRoughnessTexture.image.blender_image_name]
+
+            metallic_separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
+
+            metallic_math     = node_tree.nodes.new('ShaderNodeMath')
+            metallic_math.operation = 'MULTIPLY'
+            metallic_math.inputs[1].default_value = self.metallicFactor
+
+            metallic_mapping = node_tree.nodes.new('ShaderNodeMapping')
+
+            metallic_uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+
+            # links
+            node_tree.links.new(metallic_separate.inputs[0], metallic_text.outputs[0])
+            node_tree.links.new(metallic_math.inputs[0], metallic_separate.outputs[2])
+            node_tree.links.new(principled.inputs[4], metallic_math.outputs[0])
+
+            node_tree.links.new(metallic_mapping.inputs[0], metallic_uvmap.outputs[0])
+            node_tree.links.new(metallic_text.inputs[0], metallic_mapping.outputs[0])
 
         # link node to output
         node_tree.links.new(output_node.inputs[0], principled.outputs[0])
