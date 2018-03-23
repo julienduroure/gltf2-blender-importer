@@ -27,7 +27,10 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
     *  node animations  
     *  morph animations (shapekeys)  
 *  materials
-    *  diffuse texture
+    *  Diffuse map
+    *  Metallic map
+    *  Roughness map
+    *  Emissive map
 
 # Thanks
 
