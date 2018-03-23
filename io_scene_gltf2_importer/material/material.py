@@ -22,6 +22,7 @@
 
 import bpy
 from .pbr import *
+from .map import *
 
 class Material():
     def __init__(self, index, json, gltf):
@@ -31,6 +32,8 @@ class Material():
         self.name = None
 
         self.blender_material = None
+
+        self.emissivemap = None
 
     def read(self):
 
@@ -53,6 +56,17 @@ class Material():
         self.pbr.read()
         self.pbr.debug_missing()
 
+        # Emission
+        if 'emissiveTexture' in self.json.keys():
+            if 'emissiveFactor' in self.json.keys():
+                factor = self.json['emissiveFactor']
+            else:
+                factor = [1.0, 1.0, 1.0]
+
+            self.emissivemap = EmissiveMap(self.json['emissiveTexture'], factor, self.gltf)
+            self.emissivemap.read()
+            self.emissivemap.debug_missing()
+
     def use_vertex_color(self):
         self.pbr.use_vertex_color()
 
@@ -67,6 +81,10 @@ class Material():
 
         # create pbr material
         self.pbr.create_blender(mat.name)
+
+        # add emission map if needed
+        if self.emissivemap:
+            self.emissivemap.create_blender(mat.name)
 
     def set_uvmap(self, prim, obj):
         node_tree = bpy.data.materials[self.blender_material].node_tree
