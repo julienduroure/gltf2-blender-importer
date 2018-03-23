@@ -84,6 +84,8 @@ class Pbr():
 
         if 'roughnessFactor' in self.json.keys():
             self.roughnessFactor = self.json['roughnessFactor']
+            if self.metallic_type == self.TEXTURE:
+                self.metallic_type = self.TEXTURE_FACTOR
 
     def use_vertex_color(self):
         self.vertex_color = True
@@ -280,8 +282,10 @@ class Pbr():
             node_tree.links.new(text_node.inputs[0], mapping.outputs[0])
 
 
+        # Says metallic, but it means metallic & Roughness values
         if self.metallic_type == self.SIMPLE:
             principled.inputs[4].default_value = self.metallicFactor
+            principled.inputs[7].default_value = self.roughnessFactor
 
         elif self.metallic_type == self.TEXTURE:
             self.metallicRoughnessTexture.blender_create()
@@ -296,7 +300,8 @@ class Pbr():
 
             # links
             node_tree.links.new(metallic_separate.inputs[0], metallic_text.outputs[0])
-            node_tree.links.new(principled.inputs[4], metallic_separate.outputs[2])
+            node_tree.links.new(principled.inputs[4], metallic_separate.outputs[2]) # metallic
+            node_tree.links.new(principled.inputs[7], metallic_separate.outputs[1]) # Roughness
 
             node_tree.links.new(metallic_mapping.inputs[0], metallic_uvmap.outputs[0])
             node_tree.links.new(metallic_text.inputs[0], metallic_mapping.outputs[0])
@@ -314,14 +319,24 @@ class Pbr():
             metallic_math.operation = 'MULTIPLY'
             metallic_math.inputs[1].default_value = self.metallicFactor
 
+            roughness_math = node_tree.nodes.new('ShaderNodeMath')
+            roughness_math.operation = 'MULTIPLY'
+            roughness_math.inputs[1].default_value = self.roughnessFactor
+
             metallic_mapping = node_tree.nodes.new('ShaderNodeMapping')
 
             metallic_uvmap = node_tree.nodes.new('ShaderNodeUVMap')
 
             # links
             node_tree.links.new(metallic_separate.inputs[0], metallic_text.outputs[0])
+
+            # metallic
             node_tree.links.new(metallic_math.inputs[0], metallic_separate.outputs[2])
             node_tree.links.new(principled.inputs[4], metallic_math.outputs[0])
+
+            # roughness
+            node_tree.links.new(roughness_math.inputs[0], metallic_separate.outputs[1])
+            node_tree.links.new(principled.inputs[7], roughness_math.outputs[0])
 
             node_tree.links.new(metallic_mapping.inputs[0], metallic_uvmap.outputs[0])
             node_tree.links.new(metallic_text.inputs[0], metallic_mapping.outputs[0])
