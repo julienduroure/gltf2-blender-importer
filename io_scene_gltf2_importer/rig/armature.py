@@ -21,7 +21,7 @@
  """
 
 import bpy
-from mathutils import Vector
+from mathutils import Vector, Matrix, Quaternion
 from ..buffer import *
 
 class Skin():
@@ -59,6 +59,29 @@ class Skin():
         bpy.data.scenes[self.gltf.blender.scene].objects.link(obj)
         self.blender_armature_name = obj.name
 
+
+    def set_bone_transforms(self, bone, node, parent):
+        obj   = bpy.data.objects[self.blender_armature_name]
+        delta = Quaternion((0.7071068286895752, 0.7071068286895752, 0.0, 0.0))
+
+        mat = Matrix()
+        if not parent:
+            transform = node.get_transforms()
+            mat = transform * delta.to_matrix().to_4x4()
+        else:
+            if not self.gltf.scene.nodes[parent].is_joint: # Node in another scene
+                transform  = node.get_transforms()
+                parent_mat = self.gltf.scene.nodes[parent].get_transforms()
+            else:
+                transform = node.get_transforms()
+                parent_mat = obj.data.edit_bones[self.gltf.scene.nodes[parent].blender_bone_name].matrix # Node in another scene
+
+            mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
+            mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
+
+
+        bone.matrix = mat
+
     def create_bone(self, node, parent):
         scene = bpy.data.scenes[self.gltf.blender.scene]
         obj   = bpy.data.objects[self.blender_armature_name]
@@ -74,9 +97,8 @@ class Skin():
 
         bone = obj.data.edit_bones.new(name)
         node.blender_bone_name = bone.name
-        # Need to set head & tail locations to keep this bone alive
-        bone.head = Vector((0.0,0.0,0.0)) # TODO get transformations
-        bone.tail = Vector((0.0,0.0,1.0)) # TODO get transformations
+        bone.tail = Vector((0.0,1.0,0.0)) # Needed to keep bone alive
+        self.set_bone_transforms(bone, node, parent)
 
         # Set parent
         if parent is not None and hasattr(self.gltf.scene.nodes[parent], "blender_bone_name"):
