@@ -31,6 +31,7 @@ class Mesh():
         self.primitives = []
         self.target_weights = []
         self.name = None
+        self.skin = None
 
 
     def read(self):
