@@ -32,6 +32,7 @@ class Skin():
         self.name  = None
         self.bones = []
         self.blender_armature_name = None
+        self.mesh_id = None
 
     def read(self):
         if 'skeleton' in self.json.keys():
@@ -105,6 +106,11 @@ class Skin():
             bone.parent = obj.data.edit_bones[self.gltf.scene.nodes[parent].blender_bone_name] #TODO if in another scene
 
         bpy.ops.object.mode_set(mode="OBJECT")
+
+    def create_vertex_groups(self):
+        obj = bpy.data.objects[self.gltf.scene.nodes[self.mesh_id].blender_object]
+        for bone in self.bones:
+            obj.vertex_groups.new(self.gltf.scene.nodes[bone].blender_bone_name)
 
     def debug_missing(self):
         keys = [

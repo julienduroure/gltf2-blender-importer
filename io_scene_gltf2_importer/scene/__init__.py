@@ -63,6 +63,10 @@ class Scene():
             if node.root:
                 node.blender_create(None) # None => No parent
 
+        # Now that all mesh / bones are created, create vertex groups on mesh
+        for armature in self.gltf.skins.values():
+            armature.create_vertex_groups()
+
 
     # TODO create blender for other scenes
 

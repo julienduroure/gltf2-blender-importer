@@ -59,7 +59,7 @@ class Node():
             self.mesh.debug_missing()
 
             if 'skin' in self.json.keys():
-                self.mesh.rig(self.json['skin'])
+                self.mesh.rig(self.json['skin'], self.index)
 
         if 'camera' in self.json.keys():
             self.camera = Camera(self.json['camera'], self.name, self.gltf.json['cameras'][self.json['camera']], self.gltf)
