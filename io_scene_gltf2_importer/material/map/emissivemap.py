@@ -49,6 +49,8 @@ class EmissiveMap(Map):
         combine = node_tree.nodes.new('ShaderNodeCombineRGB')
         mapping = node_tree.nodes.new('ShaderNodeMapping')
         uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+        uvmap["gltf2_texcoord"] = self.texCoord # Set custom flag to retrieve TexCoord
+
         text  = node_tree.nodes.new('ShaderNodeTexImage')
         text.image = bpy.data.images[self.texture.image.blender_image_name]
         add = node_tree.nodes.new('ShaderNodeAddShader')

@@ -90,7 +90,8 @@ class Material():
         node_tree = bpy.data.materials[self.blender_material].node_tree
         uvmap_nodes =  [node for node in node_tree.nodes if node.type == 'UVMAP']
         for uvmap_node in uvmap_nodes:
-            uvmap_node.uv_map = prim.blender_texcoord[self.pbr.texCoord]
+            if uvmap_node["gltf2_texcoord"] in prim.blender_texcoord.keys():
+                uvmap_node.uv_map = prim.blender_texcoord[uvmap_node["gltf2_texcoord"]]
 
     def debug_missing(self):
         if self.index is None:

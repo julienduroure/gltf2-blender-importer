@@ -57,9 +57,9 @@ class Pbr():
             self.baseColorTexture.debug_missing()
 
             if 'texCoord' in self.json['baseColorTexture']:
-                self.texCoord = int(self.json['baseColorTexture']['texCoord'])
+                self.baseColorTexture.texcoord = int(self.json['baseColorTexture']['texCoord'])
             else:
-                self.texCoord = 0
+                self.baseColorTexture.texcoord = 0
 
         if 'metallicRoughnessTexture' in self.json.keys():
             self.metallic_type = self.TEXTURE
@@ -68,9 +68,9 @@ class Pbr():
             self.metallicRoughnessTexture.debug_missing()
 
             if 'texCoord' in self.json['metallicRoughnessTexture']:
-                self.texCoord = int(self.json['metallicRoughnessTexture']['texCoord'])
+                self.metallicRoughnessTexture.texcoord = int(self.json['metallicRoughnessTexture']['texCoord'])
             else:
-                self.texCoord = 0
+                self.metallicRoughnessTexture.texcoord = 0
 
         if 'baseColorFactor' in self.json.keys():
             self.baseColorFactor = self.json['baseColorFactor']
@@ -175,6 +175,7 @@ class Pbr():
             mapping = node_tree.nodes.new('ShaderNodeMapping')
 
             uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            uvmap["gltf2_texcoord"] = self.baseColorTexture.texcoord # Set custom flag to retrieve TexCoord
             # UV Map will be set after object/UVMap creation
 
             # Create links
@@ -251,6 +252,7 @@ class Pbr():
             mapping = node_tree.nodes.new('ShaderNodeMapping')
 
             uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            uvmap["gltf2_texcoord"] = self.baseColorTexture.texcoord # Set custom flag to retrieve TexCoord
             # UV Map will be set after object/UVMap creation
 
             # Create links
@@ -297,6 +299,7 @@ class Pbr():
             metallic_mapping = node_tree.nodes.new('ShaderNodeMapping')
 
             metallic_uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            metallic_uvmap["gltf2_texcoord"] = self.metallicRoughnessTexture.texcoord # Set custom flag to retrieve TexCoord
 
             # links
             node_tree.links.new(metallic_separate.inputs[0], metallic_text.outputs[0])
@@ -326,6 +329,8 @@ class Pbr():
             metallic_mapping = node_tree.nodes.new('ShaderNodeMapping')
 
             metallic_uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            metallic_uvmap["gltf2_texcoord"] = self.metallicRoughnessTexture.texcoord # Set custom flag to retrieve TexCoord
+
 
             # links
             node_tree.links.new(metallic_separate.inputs[0], metallic_text.outputs[0])
