@@ -10,8 +10,7 @@ Current version may not fully follow glTF2 specification. This will change in ne
 Easier way to install this addon is to zip the io_scene_gltf2 directory, and to install this zip file as any other blender addons.
 
 # What will NOT work (for now, until I implement it)  
-*  rigging data (no joins, no skinning)
-*  PBR materials is no complete yet
+*  samplers in textures
 
 # What should work  
 *  files  
@@ -26,11 +25,13 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
 *  animations  
     *  node animations  
     *  morph animations (shapekeys)  
-*  materials
+*  materials (samplers not taken into account yet)
     *  Diffuse map
     *  Metallic map
     *  Roughness map
     *  Emissive map
+    *  Normal map
+* rigging data
 
 # Thanks
 
