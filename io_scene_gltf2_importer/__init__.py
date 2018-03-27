@@ -47,6 +47,7 @@ class ImportglTF2(Operator, ImportHelper):
         return self.import_gltf2(context)
 
     def import_gltf2(self, context):
+        bpy.context.scene.render.engine = 'CYCLES'
         self.gltf = glTFImporter(self.filepath)
         success, txt = self.gltf.read()
         if not success:
