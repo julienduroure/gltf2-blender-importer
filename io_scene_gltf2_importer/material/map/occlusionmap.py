@@ -21,6 +21,20 @@
  """
 
 from .map import *
-from .emissivemap import *
-from .normalmap import *
-from .occlusionmap import *
+
+class OcclusionMap(Map):
+    def __init__(self, json, factor, gltf):
+        super(OcclusionMap, self).__init__(json, factor, gltf)
+
+    def create_blender(self, mat_name):
+        engine = bpy.context.scene.render.engine
+        if engine == 'CYCLES':
+            self.create_blender_cycles(mat_name)
+        else:
+            pass #TODO for internal / Eevee in future 2.8
+
+    def create_blender_cycles(self, mat_name):
+        self.texture.blender_create()
+
+        # Pack texture, but doesn't use it for now. Occlusion is calculated from Cycles.
+        bpy.data.images[self.texture.image.blender_image_name].use_fake_user = True

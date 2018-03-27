@@ -33,8 +33,9 @@ class Material():
 
         self.blender_material = None
 
-        self.emissivemap = None
-        self.normalmap   = None
+        self.emissivemap  = None
+        self.normalmap    = None
+        self.occlusionmap = None
 
     def read(self):
 
@@ -74,6 +75,12 @@ class Material():
             self.normalmap.read()
             self.normalmap.debug_missing()
 
+        # Occlusion Map
+        if 'occlusionTexture' in self.json.keys():
+            self.occlusionmap = OcclusionMap(self.json['occlusionTexture'], 1.0, self.gltf)
+            self.occlusionmap.read()
+            self.occlusionmap.debug_missing()
+
     def use_vertex_color(self):
         self.pbr.use_vertex_color()
 
@@ -97,6 +104,11 @@ class Material():
         if self.normalmap:
             self.normalmap.create_blender(mat.name)
 
+        # add occlusion map if needed
+        # will be pack, but not used
+        if self.occlusionmap:
+            self.occlusionmap.create_blender(mat.name)
+
     def set_uvmap(self, prim, obj):
         node_tree = bpy.data.materials[self.blender_material].node_tree
         uvmap_nodes =  [node for node in node_tree.nodes if node.type == 'UVMAP']
@@ -112,7 +124,8 @@ class Material():
                 'pbrMetallicRoughness',
                 'emissiveFactor',
                 'normalTexture',
-                'emissiveTexture'
+                'emissiveTexture',
+                'occlusionTexture'
                 ]
 
         for key in self.json.keys():
