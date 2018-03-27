@@ -112,6 +112,40 @@ class Skin():
         for bone in self.bones:
             obj.vertex_groups.new(self.gltf.scene.nodes[bone].blender_bone_name)
 
+    def assign_vertex_groups(self):
+        node = self.gltf.scene.nodes[self.mesh_id]
+        obj = bpy.data.objects[node.blender_object]
+
+        offset = 0
+        for prim in node.mesh.primitives:
+            if 'JOINTS_0' in prim.attributes.keys() and 'WEIGHTS_0' in prim.attributes.keys():
+
+                joint_ = prim.attributes['JOINTS_0']['result']
+                weight_ = prim.attributes['WEIGHTS_0']['result']
+
+                for poly in obj.data.polygons:
+                    for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
+                        vert_idx = obj.data.loops[loop_idx].vertex_index
+                        if vert_idx in range(offset, offset + prim.vertices_length):
+
+                            if offset != 0:
+                                tab_index = vert_idx % offset
+                            else:
+                                tab_index = vert_idx
+
+                            cpt = 0
+                            for joint_idx in joint_[tab_index]:
+                                weight_val = weight_[tab_index][cpt]
+
+                                group = obj.vertex_groups[self.gltf.scene.nodes[self.bones[joint_idx]].blender_bone_name]
+                                group.add([vert_idx], weight_val, 'REPLACE')
+                                cpt += 1
+            else:
+                print("No Skinning ?????") #TODO
+
+
+            offset = offset + prim.vertices_length
+
     def debug_missing(self):
         keys = [
                 'skeleton',

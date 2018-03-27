@@ -67,6 +67,9 @@ class Scene():
         for armature in self.gltf.skins.values():
             armature.create_vertex_groups()
 
+        for armature in self.gltf.skins.values():
+            armature.assign_vertex_groups()
+
 
     # TODO create blender for other scenes
 
