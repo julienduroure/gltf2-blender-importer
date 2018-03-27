@@ -34,6 +34,7 @@ class Material():
         self.blender_material = None
 
         self.emissivemap = None
+        self.normalmap   = None
 
     def read(self):
 
@@ -67,6 +68,12 @@ class Material():
             self.emissivemap.read()
             self.emissivemap.debug_missing()
 
+        # Normal Map
+        if 'normalTexture' in self.json.keys():
+            self.normalmap = NormalMap(self.json['normalTexture'], 1.0, self.gltf)
+            self.normalmap.read()
+            self.normalmap.debug_missing()
+
     def use_vertex_color(self):
         self.pbr.use_vertex_color()
 
@@ -85,6 +92,10 @@ class Material():
         # add emission map if needed
         if self.emissivemap:
             self.emissivemap.create_blender(mat.name)
+
+        # add normal map if needed
+        if self.normalmap:
+            self.normalmap.create_blender(mat.name)
 
     def set_uvmap(self, prim, obj):
         node_tree = bpy.data.materials[self.blender_material].node_tree

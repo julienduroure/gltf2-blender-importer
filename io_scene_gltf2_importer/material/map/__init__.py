@@ -22,3 +22,4 @@
 
 from .map import *
 from .emissivemap import *
+from .normalmap import *
