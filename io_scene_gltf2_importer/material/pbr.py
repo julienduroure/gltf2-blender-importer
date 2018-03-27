@@ -293,6 +293,7 @@ class Pbr():
             self.metallicRoughnessTexture.blender_create()
             metallic_text = node_tree.nodes.new('ShaderNodeTexImage')
             metallic_text.image = bpy.data.images[self.metallicRoughnessTexture.image.blender_image_name]
+            metallic_text.color_space = 'NONE'
 
             metallic_separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
 
@@ -315,7 +316,8 @@ class Pbr():
 
             metallic_text = node_tree.nodes.new('ShaderNodeTexImage')
             metallic_text.image = bpy.data.images[self.metallicRoughnessTexture.image.blender_image_name]
-
+            metallic_text.color_space = 'NONE'
+            
             metallic_separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
 
             metallic_math     = node_tree.nodes.new('ShaderNodeMath')
