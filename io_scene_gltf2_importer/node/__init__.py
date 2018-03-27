@@ -376,14 +376,19 @@ class Node():
             mesh.validate()
 
 
-
-            cpt_vert = 0
+            # Normals
+            offset = 0
             for prim in self.mesh.primitives:
-                if 'NORMAL' in prim.attributes.keys():
-                    for vert in mesh.vertices:
-                        vert.normal = prim.attributes['NORMAL']['result'][cpt_vert]
-                cpt_vert += 1
-
+                for poly in mesh.polygons:
+                    for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
+                        vert_idx = mesh.loops[loop_idx].vertex_index
+                        if vert_idx in range(offset, offset + prim.vertices_length):
+                            if offset != 0:
+                                cpt_vert = vert_idx % offset
+                            else:
+                                cpt_vert = vert_idx
+                            mesh.vertices[vert_idx].normal = prim.attributes['NORMAL']['result'][cpt_vert]
+            offset = offset + prim.vertices_length
 
             mesh.update()
             obj = bpy.data.objects.new(name, mesh)
@@ -395,7 +400,6 @@ class Node():
 
             # manage UV
             offset = 0
-
             for prim in self.mesh.primitives:
                 for texcoord in [attr for attr in prim.attributes.keys() if attr[:9] == "TEXCOORD_"]:
                     if not texcoord in mesh.uv_textures:
@@ -490,7 +494,11 @@ class Node():
                         for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
                             vert_idx = mesh.loops[loop_idx].vertex_index
                             if vert_idx in range(offset, offset + prim.vertices_length):
-                                vertex_color.data[loop_idx].color = color_data[vert_idx][0:3]
+                                if offset != 0:
+                                    cpt_idx = vert_idx % offset
+                                else:
+                                    cpt_idx = vert_idx
+                                vertex_color.data[loop_idx].color = color_data[cpt_idx][0:3]
                                 #TODO : no alpha in vertex color
                 offset = offset + prim.vertices_length
 
