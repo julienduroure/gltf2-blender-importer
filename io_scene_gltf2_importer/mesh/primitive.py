@@ -109,7 +109,9 @@ class Primitive():
                 'POSITION',
                 'NORMAL',
                 'TEXCOORD_0',
-                'TEXCOORD_1'
+                'TEXCOORD_1',
+                'JOINTS_0',
+                'WEIGHTS_0'
         ]
 
         for key in self.json.keys():

@@ -109,7 +109,10 @@ class Material():
             return
         keys = [
                 'name',
-                'pbrMetallicRoughness'
+                'pbrMetallicRoughness',
+                'emissiveFactor',
+                'normalTexture',
+                'emissiveTexture'
                 ]
 
         for key in self.json.keys():
