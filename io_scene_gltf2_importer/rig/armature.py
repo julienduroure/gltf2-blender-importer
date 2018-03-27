@@ -146,6 +146,21 @@ class Skin():
 
             offset = offset + prim.vertices_length
 
+    def create_armature_modifiers(self):
+        node = self.gltf.scene.nodes[self.mesh_id]
+        obj = bpy.data.objects[node.blender_object]
+
+        for obj_sel in bpy.context.scene.objects:
+            obj_sel.select = False
+        obj.select = True
+        bpy.context.scene.objects.active = obj
+
+        bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
+        obj.parent = bpy.data.objects[self.blender_armature_name]
+        arma = obj.modifiers.new(name="Armature", type="ARMATURE")
+        arma.object = bpy.data.objects[self.blender_armature_name]
+
+        
     def debug_missing(self):
         keys = [
                 'skeleton',
