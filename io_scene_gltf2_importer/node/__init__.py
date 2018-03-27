@@ -423,18 +423,21 @@ class Node():
 
             # Assign materials to mesh
             offset = 0
-            cpt_index = 0
-            loop_index = 0
+            cpt_index_mat = 0
+            bm = bmesh.new()
+            bm.from_mesh(obj.data)
+            bm.faces.ensure_lookup_table()
             for prim in self.mesh.primitives:
                 obj.data.materials.append(bpy.data.materials[prim.mat.blender_material])
-                for loop in range(offset, offset + prim.faces_length):
-                    if loop_index >= len(obj.data.polygons): # TODO : this should not happened, something is wrong
-                        print("ERROR : something wrong with loop index")
-                        break
-                    obj.data.polygons[loop].material_index = cpt_index
-                    loop_index += 1
-                offset = offset + prim.faces_length
-                cpt_index += 1
+                for vert in bm.verts:
+                    if vert.index in range(offset, offset + prim.vertices_length):
+                        for loop in vert.link_loops:
+                            face = loop.face.index
+                            bm.faces[face].material_index = cpt_index_mat
+                cpt_index_mat += 1
+                offset = offset + prim.vertices_length
+            bm.to_mesh(obj.data)
+            bm.free()
 
             # Create shapekeys if needed
             max_shape_to_create = 0
