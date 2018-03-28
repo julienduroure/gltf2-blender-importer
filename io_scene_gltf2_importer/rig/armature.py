@@ -49,7 +49,7 @@ class Skin():
             self.data = self.inverseBindMatrices.read()
             self.inverseBindMatrices.debug_missing()
 
-    def create_blender(self):
+    def create_blender_armature(self):
         if self.name is not None:
             name = self.name
         else:
