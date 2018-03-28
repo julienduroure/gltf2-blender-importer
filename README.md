@@ -12,6 +12,7 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
 # What will NOT work (for now, until I implement it)  
 *  samplers in textures
 *  rigging when parent node has some scale
+*  Camera data (currently only camera type and transforms)
 
 # What should work  
 *  files  
@@ -26,6 +27,7 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
 *  animations  
     *  node animations  
     *  morph animations (shapekeys)  
+    *  rig animations
 *  materials (samplers not taken into account yet)
     *  Diffuse map
     *  Metallic map
