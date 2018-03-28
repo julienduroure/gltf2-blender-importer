@@ -24,7 +24,8 @@ from ..buffer import *
 from ..material import *
 
 class Primitive():
-    def __init__(self, json, gltf):
+    def __init__(self, index, json, gltf):
+        self.index = index
         self.json  = json  # Primitive json
         self.gltf = gltf # Reference to global glTF instance
         self.attributes = {}

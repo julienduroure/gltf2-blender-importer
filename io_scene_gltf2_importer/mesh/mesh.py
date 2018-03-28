@@ -41,11 +41,13 @@ class Mesh():
         else:
             print("Mesh index " + str(self.index))
 
+        cpt_idx_prim = 0
         for primitive_it in self.json['primitives']:
-            primitive = Primitive(primitive_it, self.gltf)
+            primitive = Primitive(cpt_idx_prim, primitive_it, self.gltf)
             primitive.read()
             self.primitives.append(primitive)
             primitive.debug_missing()
+            cpt_idx_prim += 1
 
         # reading default targets weights if any
         if 'weights' in self.json.keys():
