@@ -330,19 +330,20 @@ class Node():
                     # Create empty armature for now
                     self.mesh.skin.create_blender()
 
+            if self.name:
+                name = self.name
+            else:
+                # Take mesh name if exist
+                if self.mesh.name:
+                    name = self.mesh.name
+                else:
+                    name = "Object_" + str(self.index)
+
             # Geometry
             if self.mesh.name:
                 mesh_name = self.mesh.name
             else:
-                if self.name:
-                    mesh_name = self.name
-                else:
-                    mesh_name = "Mesh_" + str(self.index)
-
-            if self.name:
-                name = self.name
-            else:
-                name = "Object_" + str(self.index)
+                mesh_name = "Mesh_" + str(self.index)
 
             mesh = bpy.data.meshes.new(mesh_name)
             # TODO mode of primitive 4 for now.
