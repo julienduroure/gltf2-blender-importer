@@ -136,9 +136,10 @@ class Skin():
                             cpt = 0
                             for joint_idx in joint_[tab_index]:
                                 weight_val = weight_[tab_index][cpt]
-
-                                group = obj.vertex_groups[self.gltf.scene.nodes[self.bones[joint_idx]].blender_bone_name]
-                                group.add([vert_idx], weight_val, 'REPLACE')
+                                if weight_val != 0.0:   # It can be a problem to assign weights of 0
+                                                        # for bone index 0, if there is always 4 indices in joint_ tuple
+                                    group = obj.vertex_groups[self.gltf.scene.nodes[self.bones[joint_idx]].blender_bone_name]
+                                    group.add([vert_idx], weight_val, 'REPLACE')
                                 cpt += 1
             else:
                 print("No Skinning ?????") #TODO
@@ -160,7 +161,7 @@ class Skin():
         arma = obj.modifiers.new(name="Armature", type="ARMATURE")
         arma.object = bpy.data.objects[self.blender_armature_name]
 
-        
+
     def debug_missing(self):
         keys = [
                 'skeleton',
