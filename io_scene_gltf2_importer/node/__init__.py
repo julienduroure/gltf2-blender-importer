@@ -328,7 +328,7 @@ class Node():
             if self.mesh.skin:
                 if self.mesh.skin.blender_armature_name is None:
                     # Create empty armature for now
-                    self.mesh.skin.create_blender_armature(parent)
+                    self.mesh.skin.create_blender_armature()
 
             if self.name:
                 name = self.name
@@ -524,7 +524,7 @@ class Node():
         if self.is_joint:
             # Check if corresponding armature is already created, create it if needed
             if self.gltf.skins[self.skin_id].blender_armature_name is None:
-                self.gltf.skins[self.skin_id].create_blender_armature(parent)
+                self.gltf.skins[self.skin_id].create_blender_armature()
 
             self.gltf.skins[self.skin_id].create_bone(self, parent)
 
