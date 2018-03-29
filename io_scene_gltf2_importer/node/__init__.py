@@ -466,7 +466,7 @@ class Node():
 
             for i in range(max_shape_to_create):
 
-                obj.shape_key_add("target_" + str(i)) #TODO name (can be in json file)
+                obj.shape_key_add("target_" + str(i))
 
                 for prim in self.mesh.primitives:
                     if i > len(prim.targets):
