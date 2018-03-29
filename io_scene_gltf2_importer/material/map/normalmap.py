@@ -44,14 +44,18 @@ class NormalMap(Map):
 
         # add nodes
         mapping = node_tree.nodes.new('ShaderNodeMapping')
+        mapping.location = -1000,-500
         uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+        uvmap.location = -1500, -500
         uvmap["gltf2_texcoord"] = self.texCoord # Set custom flag to retrieve TexCoord
 
         text  = node_tree.nodes.new('ShaderNodeTexImage')
         text.image = bpy.data.images[self.texture.image.blender_image_name]
         text.color_space = 'NONE'
+        text.location = -500, -500
 
         normalmap_node = node_tree.nodes.new('ShaderNodeNormalMap')
+        normalmap_node.location = -250,-500
 
 
         # create links
