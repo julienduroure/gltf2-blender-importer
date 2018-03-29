@@ -394,15 +394,16 @@ class Node():
             # Normals
             offset = 0
             for prim in self.mesh.primitives:
-                for poly in mesh.polygons:
-                    for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
-                        vert_idx = mesh.loops[loop_idx].vertex_index
-                        if vert_idx in range(offset, offset + prim.vertices_length):
-                            if offset != 0:
-                                cpt_vert = vert_idx % offset
-                            else:
-                                cpt_vert = vert_idx
-                            mesh.vertices[vert_idx].normal = prim.attributes['NORMAL']['result'][cpt_vert]
+                if 'NORMAL' in prim.attributes.keys():
+                    for poly in mesh.polygons:
+                        for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
+                            vert_idx = mesh.loops[loop_idx].vertex_index
+                            if vert_idx in range(offset, offset + prim.vertices_length):
+                                if offset != 0:
+                                    cpt_vert = vert_idx % offset
+                                else:
+                                    cpt_vert = vert_idx
+                                mesh.vertices[vert_idx].normal = prim.attributes['NORMAL']['result'][cpt_vert]
             offset = offset + prim.vertices_length
 
             mesh.update()
