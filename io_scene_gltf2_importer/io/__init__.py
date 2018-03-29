@@ -51,6 +51,7 @@ class glTFImporter():
         self.default_material = None
         self.skins = {}
         self.images = {}
+        self.animations = {}
 
         self.load()
 
@@ -173,6 +174,8 @@ class glTFImporter():
                 animation = Animation(anim_idx, self.json['animations'][anim_idx], self)
                 animation.read()
                 animation.debug_missing()
+                self.animations[animation.index] = animation
+                anim_idx += 1
 
         # Set bone type on all joints
         for node in self.scene.nodes.values():

@@ -30,6 +30,7 @@ class Animation():
         self.name  = None
 
         self.channels = []
+        self.blender_action = None
 
     def read(self):
         if not 'channels' in self.json.keys():
@@ -46,7 +47,7 @@ class Animation():
         self.dispatch_to_nodes()
 
         if 'name' in self.json.keys():
-            self.name = self.json.keys()
+            self.name = self.json['name']
 
     def dispatch_to_nodes(self):
         for channel in self.channels:
