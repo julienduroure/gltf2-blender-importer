@@ -108,9 +108,11 @@ class Pbr():
                 node_tree.nodes.remove(node)
 
         output_node = node_tree.nodes[0]
+        output_node.location = 1000,0
 
         # create PBR node
         principled = node_tree.nodes.new('ShaderNodeBsdfPrincipled')
+        principled.location = 0,0
 
         if self.color_type == self.SIMPLE:
 
@@ -125,6 +127,7 @@ class Pbr():
                 # Create attribute node to get COLOR_0 data
                 attribute_node = node_tree.nodes.new('ShaderNodeAttribute')
                 attribute_node.attribute_name = 'COLOR_0'
+                attribute_node.location = -500,0
 
                 principled.inputs[5].default_value = self.metallicFactor #TODO : currently set metallic & specular in same way
                 principled.inputs[7].default_value = self.roughnessFactor
@@ -136,6 +139,7 @@ class Pbr():
 
             #TODO alpha ?
             if self.vertex_color:
+                # TODO tree locations
                 # Create attribute / separate / math nodes
                 attribute_node = node_tree.nodes.new('ShaderNodeAttribute')
                 attribute_node.attribute_name = 'COLOR_0'
@@ -155,26 +159,34 @@ class Pbr():
             # create UV Map / Mapping / Texture nodes / separate & math and combine
             text_node = node_tree.nodes.new('ShaderNodeTexImage')
             text_node.image = bpy.data.images[self.baseColorTexture.image.blender_image_name]
+            text_node.location = -1000,500
 
             combine = node_tree.nodes.new('ShaderNodeCombineRGB')
+            combine.location = -250,500
 
             math_R  = node_tree.nodes.new('ShaderNodeMath')
+            math_R.location = -500, 750
             math_R.operation = 'MULTIPLY'
             math_R.inputs[1].default_value = self.baseColorFactor[0]
 
             math_G  = node_tree.nodes.new('ShaderNodeMath')
+            math_G.location = -500, 500
             math_G.operation = 'MULTIPLY'
             math_G.inputs[1].default_value = self.baseColorFactor[1]
 
             math_B  = node_tree.nodes.new('ShaderNodeMath')
+            math_B.location = -500, 250
             math_B.operation = 'MULTIPLY'
             math_B.inputs[1].default_value = self.baseColorFactor[2]
 
             separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
+            separate.location = -750, 500
 
             mapping = node_tree.nodes.new('ShaderNodeMapping')
+            mapping.location = -1500, 500
 
             uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            uvmap.location = -2000, 500
             uvmap["gltf2_texcoord"] = self.baseColorTexture.texcoord # Set custom flag to retrieve TexCoord
             # UV Map will be set after object/UVMap creation
 
@@ -217,41 +229,49 @@ class Pbr():
                 # Create attribute / separate / math nodes
                 attribute_node = node_tree.nodes.new('ShaderNodeAttribute')
                 attribute_node.attribute_name = 'COLOR_0'
+                attribute_node.location = -2000,250
 
                 separate_vertex_color = node_tree.nodes.new('ShaderNodeSeparateRGB')
+                separate_vertex_color.location = -1500, 250
+
                 math_vc_R = node_tree.nodes.new('ShaderNodeMath')
                 math_vc_R.operation = 'MULTIPLY'
+                math_vc_R.location = -1000,750
 
                 math_vc_G = node_tree.nodes.new('ShaderNodeMath')
                 math_vc_G.operation = 'MULTIPLY'
+                math_vc_G.location = -1000,500
 
                 math_vc_B = node_tree.nodes.new('ShaderNodeMath')
                 math_vc_B.operation = 'MULTIPLY'
+                math_vc_B.location = -1000,250
 
 
                 combine = node_tree.nodes.new('ShaderNodeCombineRGB')
-
-                math_R  = node_tree.nodes.new('ShaderNodeMath')
-                math_R.operation = 'MULTIPLY'
-                math_R.inputs[1].default_value = self.baseColorFactor[0]
-
-                math_G  = node_tree.nodes.new('ShaderNodeMath')
-                math_G.operation = 'MULTIPLY'
-                math_G.inputs[1].default_value = self.baseColorFactor[1]
-
-                math_B  = node_tree.nodes.new('ShaderNodeMath')
-                math_B.operation = 'MULTIPLY'
-                math_B.inputs[1].default_value = self.baseColorFactor[2]
+                combine.location = -500,500
 
                 separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
+                separate.location = -1500, 500
 
             # create UV Map / Mapping / Texture nodes / separate & math and combine
             text_node = node_tree.nodes.new('ShaderNodeTexImage')
             text_node.image = bpy.data.images[self.baseColorTexture.image.blender_image_name]
+            if self.vertex_color:
+                text_node.location = -2000,500
+            else:
+                text_node.location = -500,500
 
             mapping = node_tree.nodes.new('ShaderNodeMapping')
+            if self.vertex_color:
+                mapping.location = -2500,500
+            else:
+                mapping.location = -1500,500
 
             uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            if self.vertex_color:
+                uvmap.location = -3000,500
+            else:
+                uvmap.location = -2000,500
             uvmap["gltf2_texcoord"] = self.baseColorTexture.texcoord # Set custom flag to retrieve TexCoord
             # UV Map will be set after object/UVMap creation
 
@@ -259,21 +279,21 @@ class Pbr():
             if self.vertex_color:
                 node_tree.links.new(separate_vertex_color.inputs[0], attribute_node.outputs[0])
 
-                node_tree.links.new(math_R.inputs[1], separate_vertex_color.outputs[0])
-                node_tree.links.new(math_G.inputs[1], separate_vertex_color.outputs[1])
-                node_tree.links.new(math_B.inputs[1], separate_vertex_color.outputs[2])
+                node_tree.links.new(math_vc_R.inputs[1], separate_vertex_color.outputs[0])
+                node_tree.links.new(math_vc_G.inputs[1], separate_vertex_color.outputs[1])
+                node_tree.links.new(math_vc_B.inputs[1], separate_vertex_color.outputs[2])
 
-                node_tree.links.new(combine.inputs[0], math_R.outputs[0])
-                node_tree.links.new(combine.inputs[1], math_G.outputs[0])
-                node_tree.links.new(combine.inputs[2], math_B.outputs[0])
+                node_tree.links.new(combine.inputs[0], math_vc_R.outputs[0])
+                node_tree.links.new(combine.inputs[1], math_vc_G.outputs[0])
+                node_tree.links.new(combine.inputs[2], math_vc_B.outputs[0])
 
                 node_tree.links.new(separate.inputs[0], text_node.outputs[0])
 
-                node_tree.links.new(math_R.inputs[0], separate.outputs[0])
-                node_tree.links.new(math_G.inputs[0], separate.outputs[1])
-                node_tree.links.new(math_B.inputs[0], separate.outputs[2])
-
                 node_tree.links.new(principled.inputs[0], combine.outputs[0])
+
+                node_tree.links.new(math_vc_R.inputs[0], separate.outputs[0])
+                node_tree.links.new(math_vc_G.inputs[0], separate.outputs[1])
+                node_tree.links.new(math_vc_B.inputs[0], separate.outputs[2])
 
             else:
                 node_tree.links.new(principled.inputs[0], text_node.outputs[0])
@@ -294,12 +314,16 @@ class Pbr():
             metallic_text = node_tree.nodes.new('ShaderNodeTexImage')
             metallic_text.image = bpy.data.images[self.metallicRoughnessTexture.image.blender_image_name]
             metallic_text.color_space = 'NONE'
+            metallic_text.location = -500,0
 
             metallic_separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
+            metallic_separate.location = -250,0
 
             metallic_mapping = node_tree.nodes.new('ShaderNodeMapping')
+            metallic_mapping.location = -1000,0
 
             metallic_uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            metallic_uvmap.location = -1500,0
             metallic_uvmap["gltf2_texcoord"] = self.metallicRoughnessTexture.texcoord # Set custom flag to retrieve TexCoord
 
             # links
@@ -317,20 +341,26 @@ class Pbr():
             metallic_text = node_tree.nodes.new('ShaderNodeTexImage')
             metallic_text.image = bpy.data.images[self.metallicRoughnessTexture.image.blender_image_name]
             metallic_text.color_space = 'NONE'
-            
+            metallic_text.location = -1000,0
+
             metallic_separate = node_tree.nodes.new('ShaderNodeSeparateRGB')
+            metallic_separate.location = -500,0
 
             metallic_math     = node_tree.nodes.new('ShaderNodeMath')
             metallic_math.operation = 'MULTIPLY'
             metallic_math.inputs[1].default_value = self.metallicFactor
+            metallic_math.location = -250,100
 
             roughness_math = node_tree.nodes.new('ShaderNodeMath')
             roughness_math.operation = 'MULTIPLY'
             roughness_math.inputs[1].default_value = self.roughnessFactor
+            roughness_math.location = -250,-100
 
             metallic_mapping = node_tree.nodes.new('ShaderNodeMapping')
+            metallic_mapping.location = -1000,0
 
             metallic_uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            metallic_uvmap.location = -1500,0
             metallic_uvmap["gltf2_texcoord"] = self.metallicRoughnessTexture.texcoord # Set custom flag to retrieve TexCoord
 
 
