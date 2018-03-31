@@ -49,7 +49,7 @@ class Skin():
             self.data = self.inverseBindMatrices.read()
             self.inverseBindMatrices.debug_missing()
 
-    def create_blender_armature(self):
+    def create_blender_armature(self, parent):
         if self.name is not None:
             name = self.name
         else:
@@ -59,6 +59,8 @@ class Skin():
         obj = bpy.data.objects.new(name, armature)
         bpy.data.scenes[self.gltf.blender.scene].objects.link(obj)
         self.blender_armature_name = obj.name
+        if parent:
+            obj.parent = bpy.data.objects[self.gltf.scene.nodes[parent].blender_object]
 
 
     def set_bone_transforms(self, bone, node, parent):
@@ -70,18 +72,20 @@ class Skin():
             transform = node.get_transforms()
             mat = transform * delta.to_matrix().to_4x4()
         else:
-            if not self.gltf.scene.nodes[parent].is_joint: # Node in another scene
+            if not self.gltf.scene.nodes[parent].is_joint: # TODO if Node in another scene
                 transform  = node.get_transforms()
-                parent_mat = self.gltf.scene.nodes[parent].get_transforms()
+                parent_mat = bpy.data.objects[self.gltf.scene.nodes[parent].blender_object].matrix_world
+                mat = transform * parent_mat.inverted()
             else:
                 transform = node.get_transforms()
                 parent_mat = obj.data.edit_bones[self.gltf.scene.nodes[parent].blender_bone_name].matrix # Node in another scene
 
-            mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-            mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
-
+                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
+                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
+                #TODO scaling of bones
 
         bone.matrix = mat
+        return bone.matrix
 
     def create_bone(self, node, parent):
         scene = bpy.data.scenes[self.gltf.blender.scene]
@@ -99,7 +103,8 @@ class Skin():
         bone = obj.data.edit_bones.new(name)
         node.blender_bone_name = bone.name
         bone.tail = Vector((0.0,1.0,0.0)) # Needed to keep bone alive
-        self.set_bone_transforms(bone, node, parent)
+        mat = self.set_bone_transforms(bone, node, parent)
+        node.blender_bone_matrix = mat
 
         # Set parent
         if parent is not None and hasattr(self.gltf.scene.nodes[parent], "blender_bone_name"):
@@ -156,8 +161,8 @@ class Skin():
         obj.select = True
         bpy.context.scene.objects.active = obj
 
-        bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
-        obj.parent = bpy.data.objects[self.blender_armature_name]
+        #bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
+        #obj.parent = bpy.data.objects[self.blender_armature_name]
         arma = obj.modifiers.new(name="Armature", type="ARMATURE")
         arma.object = bpy.data.objects[self.blender_armature_name]
 

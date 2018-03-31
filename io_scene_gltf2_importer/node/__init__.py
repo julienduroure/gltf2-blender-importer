@@ -183,18 +183,19 @@ class Node():
                     for key in channel.data:
                         transform = Matrix.Translation(self.convert_location(list(key[1])))
                         if not self.parent:
-                            mat = transform
+                            mat = transform * delta.to_matrix().to_4x4()
                         else:
-                            if not self.gltf.scene.nodes[self.parent].is_joint:
-                                parent_mat = self.gltf.scene.nodes[self.parent].get_transforms()
+                            if not self.gltf.scene.nodes[self.parent].is_joint: # TODO if Node in another scene
+                                parent_mat = bpy.data.objects[self.gltf.scene.nodes[self.parent].blender_object].matrix_world
+                                mat = transform * parent_mat.inverted()
                             else:
-                                parent_mat = obj.pose.bones[self.gltf.scene.nodes[self.parent].blender_bone_name].matrix # Node in another scene
+                                parent_mat = self.gltf.scene.nodes[self.parent].blender_bone_matrix
 
-                            mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-                            mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
+                                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
+                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
+                                #TODO scaling of bones
 
-                        mat = obj.convert_space(bone, mat, 'WORLD', 'LOCAL')
-                        bone.location = mat.to_translation()
+                        bone.location = self.blender_bone_matrix.to_translation() - mat.to_translation()
                         bone.keyframe_insert(blender_path, frame = key[0] * fps, group='location')
 
 
@@ -208,18 +209,20 @@ class Node():
                     for key in channel.data:
                         transform = (self.convert_quaternion(key[1])).to_matrix().to_4x4()
                         if not self.parent:
-                            mat = transform
+                            mat = transform * delta.to_matrix().to_4x4()
                         else:
-                            if not self.gltf.scene.nodes[self.parent].is_joint:
-                                parent_mat = self.gltf.scene.nodes[self.parent].get_transforms()
+                            if not self.gltf.scene.nodes[self.parent].is_joint: # TODO if Node in another scene
+                                parent_mat = bpy.data.objects[self.gltf.scene.nodes[self.parent].blender_object].matrix_world
+                                mat = transform * parent_mat.inverted()
                             else:
-                                parent_mat = obj.pose.bones[self.gltf.scene.nodes[self.parent].blender_bone_name].matrix # Node in another scene
+                                parent_mat = self.gltf.scene.nodes[self.parent].blender_bone_matrix
 
-                            mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-                            mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
+                                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
+                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
+                                #TODO scaling of bones
 
-                        mat = obj.convert_space(bone, mat, 'WORLD', 'LOCAL')
-                        bone.rotation_quaternion = mat.to_quaternion()
+                        bone.rotation_quaternion = self.blender_bone_matrix.to_quaternion().inverted() * mat.to_quaternion()
+                        #bone.rotation_quaternion = self.blender_bone_matrix.to_quaternion() * mat.to_quaternion().inverted()
                         bone.keyframe_insert(blender_path, frame = key[0] * fps, group='rotation')
 
                     # Setting interpolation
@@ -240,18 +243,20 @@ class Node():
                         ])
 
                         if not self.parent:
-                            mat = transform
+                            mat = transform * delta.to_matrix().to_4x4()
                         else:
-                            if not self.gltf.scene.nodes[self.parent].is_joint:
-                                parent_mat = self.gltf.scene.nodes[self.parent].get_transforms()
+                            if not self.gltf.scene.nodes[self.parent].is_joint: # TODO if Node in another scene
+                                parent_mat = bpy.data.objects[self.gltf.scene.nodes[self.parent].blender_object].matrix_world
+                                mat = transform * parent_mat.inverted()
                             else:
-                                parent_mat = obj.pose.bones[self.gltf.scene.nodes[self.parent].blender_bone_name].matrix # Node in another scene
+                                parent_mat = self.gltf.scene.nodes[self.parent].blender_bone_matrix
 
-                            mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-                            mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
+                                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
+                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
+                                #TODO scaling of bones
 
-                        mat = obj.convert_space(bone, mat, 'WORLD', 'LOCAL')
-                        bone.scale = mat.to_scale()
+
+                        #bone.scale # TODO
                         bone.keyframe_insert(blender_path, frame = key[0] * fps, group='scale')
 
                     # Setting interpolation
@@ -342,7 +347,7 @@ class Node():
             if self.mesh.skin:
                 if self.mesh.skin.blender_armature_name is None:
                     # Create empty armature for now
-                    self.mesh.skin.create_blender_armature()
+                    self.mesh.skin.create_blender_armature(parent)
 
             if self.name:
                 name = self.name
@@ -539,7 +544,7 @@ class Node():
         if self.is_joint:
             # Check if corresponding armature is already created, create it if needed
             if self.gltf.skins[self.skin_id].blender_armature_name is None:
-                self.gltf.skins[self.skin_id].create_blender_armature()
+                self.gltf.skins[self.skin_id].create_blender_armature(parent)
 
             self.gltf.skins[self.skin_id].create_bone(self, parent)
 
