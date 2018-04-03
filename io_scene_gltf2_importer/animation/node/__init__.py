@@ -20,5 +20,6 @@
  * ***** END GPL LICENSE BLOCK *****
  """
 
-from .animation import *
-from .node import *
+from .animation_data import *
+from .animation_bone import *
+from .animation_node import *

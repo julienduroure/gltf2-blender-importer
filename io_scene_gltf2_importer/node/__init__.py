@@ -27,6 +27,7 @@ from mathutils import Matrix, Vector, Quaternion
 
 from ..mesh import *
 from ..camera import *
+from ..animation import *
 
 class Node():
     def __init__(self, index, json, gltf, root, scene):
@@ -39,7 +40,7 @@ class Node():
         self.camera = None
         self.children = []
         self.blender_object = ""
-        self.anims = {}
+        self.animation = AnimationData(self, self.gltf)
         self.is_joint = False
         self.parent = None
 
@@ -76,11 +77,6 @@ class Node():
             child.debug_missing()
             self.children.append(child)
             self.scene.nodes[child.index] = child
-
-    def set_anim(self, channel):
-        if channel.anim.index not in self.anims.keys():
-            self.anims[channel.anim.index] = []
-        self.anims[channel.anim.index].append(channel)
 
     def get_transforms(self):
 
@@ -126,186 +122,6 @@ class Node():
                     return
 
         print("ERROR, parent not found")
-
-    def blender_bone_create_anim(self):
-        obj   = bpy.data.objects[self.gltf.skins[self.skin_id].blender_armature_name]
-        bone  = obj.pose.bones[self.blender_bone_name]
-        fps = bpy.context.scene.render.fps
-        delta = Quaternion((0.7071068286895752, 0.7071068286895752, 0.0, 0.0))
-
-        for anim in self.anims.keys():
-            if not self.gltf.animations[anim].blender_action:
-                if self.gltf.animations[anim].name:
-                    name = self.gltf.animations[anim].name
-                else:
-                    name = "Animation_" + str(self.gltf.animations[anim].index)
-                action = bpy.data.actions.new(name)
-                self.gltf.animations[anim].blender_action = action.name
-            if not obj.animation_data:
-                obj.animation_data_create()
-            obj.animation_data.action = bpy.data.actions[self.gltf.animations[anim].blender_action]
-
-            for channel in self.anims[anim]:
-                if channel.path == "translation":
-                    blender_path = "location"
-                    for key in channel.data:
-                        transform = Matrix.Translation(self.gltf.convert.location(list(key[1])))
-                        if not self.parent:
-                            mat = transform * delta.to_matrix().to_4x4()
-                        else:
-                            if not self.gltf.scene.nodes[self.parent].is_joint: # TODO if Node in another scene
-                                parent_mat = bpy.data.objects[self.gltf.scene.nodes[self.parent].blender_object].matrix_world
-                                mat = transform * parent_mat.inverted()
-                            else:
-                                parent_mat = self.gltf.scene.nodes[self.parent].blender_bone_matrix
-
-                                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
-                                #TODO scaling of bones
-
-                        bone.location = self.blender_bone_matrix.to_translation() - mat.to_translation()
-                        bone.keyframe_insert(blender_path, frame = key[0] * fps, group='location')
-
-
-                    # Setting interpolation
-                    for fcurve in [curve for curve in obj.animation_data.action.fcurves if curve.group.name == "rotation"]:
-                        for kf in fcurve.keyframe_points:
-                            self.set_interpolation(channel.interpolation, kf)
-
-                elif channel.path == "rotation":
-                    blender_path = "rotation_quaternion"
-                    for key in channel.data:
-                        transform = (self.gltf.convert.quaternion(key[1])).to_matrix().to_4x4()
-                        if not self.parent:
-                            mat = transform * delta.to_matrix().to_4x4()
-                        else:
-                            if not self.gltf.scene.nodes[self.parent].is_joint: # TODO if Node in another scene
-                                parent_mat = bpy.data.objects[self.gltf.scene.nodes[self.parent].blender_object].matrix_world
-                                mat = transform * parent_mat.inverted()
-                            else:
-                                parent_mat = self.gltf.scene.nodes[self.parent].blender_bone_matrix
-
-                                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
-                                #TODO scaling of bones
-
-                        bone.rotation_quaternion = self.blender_bone_matrix.to_quaternion().inverted() * mat.to_quaternion()
-                        #bone.rotation_quaternion = self.blender_bone_matrix.to_quaternion() * mat.to_quaternion().inverted()
-                        bone.keyframe_insert(blender_path, frame = key[0] * fps, group='rotation')
-
-                    # Setting interpolation
-                    for fcurve in [curve for curve in obj.animation_data.action.fcurves if curve.group.name == "rotation"]:
-                        for kf in fcurve.keyframe_points:
-                            self.set_interpolation(channel.interpolation, kf)
-
-
-                elif channel.path == "scale":
-                    blender_path = "scale"
-                    for key in channel.data:
-                        s = self.gltf.convert.scale(list(key[1]))
-                        transform = Matrix([
-                            [s[0], 0, 0, 0],
-                            [0, s[1], 0, 0],
-                            [0, 0, s[2], 0],
-                            [0, 0, 0, 1]
-                        ])
-
-                        if not self.parent:
-                            mat = transform * delta.to_matrix().to_4x4()
-                        else:
-                            if not self.gltf.scene.nodes[self.parent].is_joint: # TODO if Node in another scene
-                                parent_mat = bpy.data.objects[self.gltf.scene.nodes[self.parent].blender_object].matrix_world
-                                mat = transform * parent_mat.inverted()
-                            else:
-                                parent_mat = self.gltf.scene.nodes[self.parent].blender_bone_matrix
-
-                                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
-                                #TODO scaling of bones
-
-
-                        #bone.scale # TODO
-                        bone.keyframe_insert(blender_path, frame = key[0] * fps, group='scale')
-
-                    # Setting interpolation
-                    for fcurve in [curve for curve in obj.animation_data.action.fcurves if curve.group.name == "rotation"]:
-                        for kf in fcurve.keyframe_points:
-                            self.set_interpolation(channel.interpolation, kf)
-
-    def blender_create_anim(self):
-        obj = bpy.data.objects[self.blender_object]
-        fps = bpy.context.scene.render.fps
-
-        for anim in self.anims.keys():
-            if not self.gltf.animations[anim].blender_action:
-                if self.gltf.animations[anim].name:
-                    name = self.gltf.animations[anim].name
-                else:
-                    name = "Animation_" + str(self.gltf.animations[anim].index)
-                action = bpy.data.actions.new(name)
-                self.gltf.animations[anim].blender_action = action.name
-            if not obj.animation_data:
-                obj.animation_data_create()
-            obj.animation_data.action = bpy.data.actions[self.gltf.animations[anim].blender_action]
-
-            for channel in self.anims[anim]:
-                if channel.path in ['translation', 'rotation', 'scale']:
-
-                    if channel.path == "translation":
-                        blender_path = "location"
-                        for key in channel.data:
-                           obj.location = Vector(self.gltf.convert.location(list(key[1])))
-                           obj.keyframe_insert(blender_path, frame = key[0] * fps, group='location')
-
-                        # Setting interpolation
-                        for fcurve in [curve for curve in obj.animation_data.action.fcurves if curve.group.name == "rotation"]:
-                            for kf in fcurve.keyframe_points:
-                                self.set_interpolation(channel.interpolation, kf)
-
-                    elif channel.path == "rotation":
-                        blender_path = "rotation_quaternion"
-                        for key in channel.data:
-                            obj.rotation_quaternion = self.gltf.convert.quaternion(key[1])
-                            obj.keyframe_insert(blender_path, frame = key[0] * fps, group='rotation')
-
-                        # Setting interpolation
-                        for fcurve in [curve for curve in obj.animation_data.action.fcurves if curve.group.name == "rotation"]:
-                            for kf in fcurve.keyframe_points:
-                                self.set_interpolation(channel.interpolation, kf)
-
-
-                    elif channel.path == "scale":
-                        blender_path = "scale"
-                        for key in channel.data:
-                            obj.scale = Vector(self.gltf.convert.scale(list(key[1])))
-                            obj.keyframe_insert(blender_path, frame = key[0] * fps, group='scale')
-
-                        # Setting interpolation
-                        for fcurve in [curve for curve in obj.animation_data.action.fcurves if curve.group.name == "rotation"]:
-                            for kf in fcurve.keyframe_points:
-                                self.set_interpolation(channel.interpolation, kf)
-
-                elif channel.path == 'weights':
-                    cpt_sk = 0
-                    for sk in channel.data:
-                        for key in sk:
-                            obj.data.shape_keys.key_blocks[cpt_sk+1].value = key[1]
-                            obj.data.shape_keys.key_blocks[cpt_sk+1].keyframe_insert("value", frame=key[0] * fps, group='ShapeKeys')
-
-                        cpt_sk += 1
-
-    def set_interpolation(self, interpolation, kf):
-        if interpolation == "LINEAR":
-            kf.interpolation = 'LINEAR'
-        elif interpolation == "STEP":
-            kf.interpolation = 'CONSTANT'
-        elif interpolation == "CATMULLROMSPLINE":
-            kf.interpolation = 'BEZIER' #TODO
-        elif interpolation == "CUBICSPLINE":
-            kf.interpolation = 'BEZIER' #TODO
-        else:
-            print("Unknown interpolation : " + self.interpolation)
-            kf.interpolation = 'BEZIER'
 
     def blender_create(self, parent):
         self.parent = parent
@@ -497,7 +313,7 @@ class Node():
             for child in self.children:
                 child.blender_create(self.index)
 
-            self.blender_create_anim()
+            self.animation.blender_anim()
             return
 
         if self.camera:
@@ -516,7 +332,7 @@ class Node():
 
             self.gltf.skins[self.skin_id].create_bone(self, parent)
 
-            self.blender_bone_create_anim()
+            self.animation.blender_anim()
 
             for child in self.children:
                 child.blender_create(self.index)
@@ -534,7 +350,7 @@ class Node():
         self.set_transforms(obj)
         self.blender_object = obj.name
         self.set_blender_parent(obj, parent)
-        self.blender_create_anim()
+        self.animation.blender_anim()
 
         for child in self.children:
             child.blender_create(self.index)

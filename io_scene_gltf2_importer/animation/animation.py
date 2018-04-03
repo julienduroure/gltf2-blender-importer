@@ -53,7 +53,7 @@ class Animation():
         for channel in self.channels:
             node = self.gltf.get_node(channel.node)
             if node:
-                node.set_anim(channel)
+                node.animation.set_anim(channel)
             else:
                 print("ERROR, node not found")
 
