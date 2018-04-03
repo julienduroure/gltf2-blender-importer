@@ -114,7 +114,7 @@ class Node():
         obj.matrix_world =  self.transform
 
 
-    def set_parent(self, obj, parent):
+    def set_blender_parent(self, obj, parent):
 
         if parent is None:
             return
@@ -385,7 +385,7 @@ class Node():
             bpy.data.scenes[self.gltf.blender.scene].objects.link(obj)
             self.set_transforms(obj)
             self.blender_object = obj.name
-            self.set_parent(obj, parent)
+            self.set_blender_parent(obj, parent)
 
             # manage UV
             offset = 0
@@ -504,7 +504,7 @@ class Node():
             obj = self.camera.create_blender()
             self.set_transforms(obj) #TODO default rotation of cameras ?
             self.blender_object = obj.name
-            self.set_parent(obj, parent)
+            self.set_blender_parent(obj, parent)
 
             return
 
@@ -533,7 +533,7 @@ class Node():
         bpy.data.scenes[self.gltf.blender.scene].objects.link(obj)
         self.set_transforms(obj)
         self.blender_object = obj.name
-        self.set_parent(obj, parent)
+        self.set_blender_parent(obj, parent)
         self.blender_create_anim()
 
         for child in self.children:
