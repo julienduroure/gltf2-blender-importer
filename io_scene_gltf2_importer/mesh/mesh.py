@@ -81,36 +81,18 @@ class Mesh():
             mesh_name = "Mesh_" + str(self.index)
 
         mesh = bpy.data.meshes.new(mesh_name)
-        # TODO mode of primitive 4 for now.
-        # TODO move some parts on mesh / primitive classes ?
         verts = []
         edges = []
         faces = []
         for prim in self.primitives:
-            current_length = len(verts)
-            prim_verts = [self.gltf.convert.location(vert) for vert in prim.attributes['POSITION']['result']]
-            prim.vertices_length = len(prim_verts)
-            verts.extend(prim_verts)
-            prim_faces = []
-            for i in range(0, len(prim.indices), 3):
-                vals = prim.indices[i:i+3]
-                new_vals = []
-                for y in vals:
-                    new_vals.append(y+current_length)
-                prim_faces.append(tuple(new_vals))
-            faces.extend(prim_faces)
-            prim.faces_length = len(prim_faces)
-
-            # manage material of primitive
-            if prim.mat:
-
-                # Create Blender material
-                if not prim.mat.blender_material:
-                    prim.mat.create_blender()
+            verts, edges, faces = prim.blender_create(verts, edges, faces)
 
         mesh.from_pydata(verts, edges, faces)
         mesh.validate()
 
+        return mesh
+
+    def blender_set_mesh(self, mesh, obj):
 
         # Normals
         offset = 0
@@ -128,9 +110,6 @@ class Mesh():
         offset = offset + prim.vertices_length
 
         mesh.update()
-        return mesh
-
-    def blender_set_mesh(self, mesh, obj):
 
         # manage UV
         offset = 0

@@ -98,6 +98,32 @@ class Primitive():
                     target[attr]['accessor'].debug_missing()
                 self.targets.append(target)
 
+
+    def blender_create(self, verts, edges, faces):
+        # TODO mode of primitive 4 for now.
+        current_length = len(verts)
+        prim_verts = [self.gltf.convert.location(vert) for vert in self.attributes['POSITION']['result']]
+        self.vertices_length = len(prim_verts)
+        verts.extend(prim_verts)
+        prim_faces = []
+        for i in range(0, len(self.indices), 3):
+            vals = self.indices[i:i+3]
+            new_vals = []
+            for y in vals:
+                new_vals.append(y+current_length)
+            prim_faces.append(tuple(new_vals))
+        faces.extend(prim_faces)
+        self.faces_length = len(prim_faces)
+
+        # manage material of primitive
+        if self.mat:
+
+            # Create Blender material
+            if not self.mat.blender_material:
+                self.mat.create_blender()
+
+        return verts, edges, faces
+
     def debug_missing(self):
         keys = [
                 'indices',
