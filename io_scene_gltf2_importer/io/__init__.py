@@ -24,6 +24,7 @@ import json
 
 from ..scene import *
 from ..animation import *
+from ..util import *
 
 
 
@@ -38,12 +39,11 @@ class BlenderData():
 
 class glTFImporter():
 
-
-
-
     def __init__(self, filename):
         self.filename = filename
         self.other_scenes = []
+
+        self.convert = Conversion()
 
 
         self.buffers = {}

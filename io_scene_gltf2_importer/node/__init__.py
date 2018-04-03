@@ -82,42 +82,10 @@ class Node():
             self.anims[channel.anim.index] = []
         self.anims[channel.anim.index].append(channel)
 
-    def convert_matrix(self, mat_input):
-        mat_input =  Matrix([mat_input[0:4], mat_input[4:8], mat_input[8:12], mat_input[12:16]])
-        mat_input.transpose()
-
-        s = mat_input.to_scale()
-        rotation = mat_input.to_quaternion()
-        location = mat_input.to_translation()
-
-        mat = Matrix([
-            [s[0], 0, 0, 0],
-            [0, s[1], 0, 0],
-            [0, 0, s[2], 0],
-            [0, 0, 0, 1]
-        ])
-
-        mat = self.convert_matrix_quaternion(rotation).to_matrix().to_4x4() * mat
-        mat = Matrix.Translation(Vector(self.convert_location(location))) * mat
-
-        return mat
-
-    def convert_quaternion(self, q):
-        return Quaternion([q[3], q[0], -q[2], q[1]])
-
-    def convert_matrix_quaternion(self, q):
-        return Quaternion([q[0], q[1], -q[3], q[2]])
-
-    def convert_location(self, location):
-        return [location[0], -location[2], location[1]]
-
-    def convert_scale(self, scale):
-        return scale # TODO test scale animation
-
     def get_transforms(self):
 
         if 'matrix' in self.json.keys():
-            return self.convert_matrix(self.json['matrix'])
+            return self.gltf.convert.matrix(self.json['matrix'])
 
         mat = Matrix()
 
@@ -133,11 +101,11 @@ class Node():
 
 
         if 'rotation' in self.json.keys():
-            q = self.convert_quaternion(self.json['rotation'])
+            q = self.gltf.convert.quaternion(self.json['rotation'])
             mat = q.to_matrix().to_4x4() * mat
 
         if 'translation' in self.json.keys():
-            mat = Matrix.Translation(Vector(self.convert_location(self.json['translation']))) * mat
+            mat = Matrix.Translation(Vector(self.gltf.convert.location(self.json['translation']))) * mat
 
         return mat
 
@@ -181,7 +149,7 @@ class Node():
                 if channel.path == "translation":
                     blender_path = "location"
                     for key in channel.data:
-                        transform = Matrix.Translation(self.convert_location(list(key[1])))
+                        transform = Matrix.Translation(self.gltf.convert.location(list(key[1])))
                         if not self.parent:
                             mat = transform * delta.to_matrix().to_4x4()
                         else:
@@ -207,7 +175,7 @@ class Node():
                 elif channel.path == "rotation":
                     blender_path = "rotation_quaternion"
                     for key in channel.data:
-                        transform = (self.convert_quaternion(key[1])).to_matrix().to_4x4()
+                        transform = (self.gltf.convert.quaternion(key[1])).to_matrix().to_4x4()
                         if not self.parent:
                             mat = transform * delta.to_matrix().to_4x4()
                         else:
@@ -234,7 +202,7 @@ class Node():
                 elif channel.path == "scale":
                     blender_path = "scale"
                     for key in channel.data:
-                        s = self.convert_scale(list(key[1]))
+                        s = self.gltf.convert.scale(list(key[1]))
                         transform = Matrix([
                             [s[0], 0, 0, 0],
                             [0, s[1], 0, 0],
@@ -286,7 +254,7 @@ class Node():
                     if channel.path == "translation":
                         blender_path = "location"
                         for key in channel.data:
-                           obj.location = Vector(self.convert_location(list(key[1])))
+                           obj.location = Vector(self.gltf.convert.location(list(key[1])))
                            obj.keyframe_insert(blender_path, frame = key[0] * fps, group='location')
 
                         # Setting interpolation
@@ -297,7 +265,7 @@ class Node():
                     elif channel.path == "rotation":
                         blender_path = "rotation_quaternion"
                         for key in channel.data:
-                            obj.rotation_quaternion = self.convert_quaternion(key[1])
+                            obj.rotation_quaternion = self.gltf.convert.quaternion(key[1])
                             obj.keyframe_insert(blender_path, frame = key[0] * fps, group='rotation')
 
                         # Setting interpolation
@@ -309,7 +277,7 @@ class Node():
                     elif channel.path == "scale":
                         blender_path = "scale"
                         for key in channel.data:
-                            obj.scale = Vector(self.convert_scale(list(key[1])))
+                            obj.scale = Vector(self.gltf.convert.scale(list(key[1])))
                             obj.keyframe_insert(blender_path, frame = key[0] * fps, group='scale')
 
                         # Setting interpolation
@@ -372,7 +340,7 @@ class Node():
             faces = []
             for prim in self.mesh.primitives:
                 current_length = len(verts)
-                prim_verts = [self.convert_location(vert) for vert in prim.attributes['POSITION']['result']]
+                prim_verts = [self.gltf.convert.location(vert) for vert in prim.attributes['POSITION']['result']]
                 prim.vertices_length = len(prim_verts)
                 verts.extend(prim_verts)
                 prim_faces = []
@@ -485,7 +453,7 @@ class Node():
                     vert_idx = 0
                     for vert in bm.verts:
                         shape = vert[shape_layer]
-                        co = self.convert_location(list(prim.targets[i]['POSITION']['result'][vert_idx]))
+                        co = self.gltf.convert.location(list(prim.targets[i]['POSITION']['result'][vert_idx]))
                         shape.x = obj.data.vertices[vert_idx].co.x + co[0]
                         shape.y = obj.data.vertices[vert_idx].co.y + co[1]
                         shape.z = obj.data.vertices[vert_idx].co.z + co[2]
