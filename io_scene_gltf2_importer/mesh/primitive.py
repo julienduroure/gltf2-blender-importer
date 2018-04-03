@@ -23,6 +23,8 @@
 from ..buffer import *
 from ..material import *
 
+from mathutils import Vector
+
 class Primitive():
     def __init__(self, index, json, gltf):
         self.index = index
@@ -123,6 +125,50 @@ class Primitive():
                 self.mat.create_blender()
 
         return verts, edges, faces
+
+    def blender_set_normals(self, mesh, offset):
+        if 'NORMAL' in self.attributes.keys():
+            for poly in mesh.polygons:
+                for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
+                    vert_idx = mesh.loops[loop_idx].vertex_index
+                    if vert_idx in range(offset, offset + self.vertices_length):
+                        if offset != 0:
+                            cpt_vert = vert_idx % offset
+                        else:
+                            cpt_vert = vert_idx
+                        mesh.vertices[vert_idx].normal = self.attributes['NORMAL']['result'][cpt_vert]
+        offset = offset + self.vertices_length
+        return offset
+
+    def blender_set_UV(self, obj, mesh, offset):
+        for texcoord in [attr for attr in self.attributes.keys() if attr[:9] == "TEXCOORD_"]:
+            if not texcoord in mesh.uv_textures:
+                mesh.uv_textures.new(texcoord)
+                self.blender_texcoord[int(texcoord[9:])] = texcoord
+
+            for poly in mesh.polygons:
+                for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
+                    vert_idx = mesh.loops[loop_idx].vertex_index
+                    if vert_idx in range(offset, offset + self.vertices_length):
+                        obj.data.uv_layers[texcoord].data[loop_idx].uv = Vector((self.attributes[texcoord]['result'][vert_idx-offset][0], 1-self.attributes[texcoord]['result'][vert_idx-offset][1]))
+
+        offset = offset + self.vertices_length
+        return offset
+
+    def blender_set_UV_in_mat(self, obj):
+        if self.mat.pbr.color_type in [self.mat.pbr.TEXTURE, self.mat.pbr.TEXTURE_FACTOR] :
+            self.mat.set_uvmap(self, obj)
+
+    def blender_assign_material(self, obj, bm, offset, cpt_index_mat):
+        obj.data.materials.append(bpy.data.materials[self.mat.blender_material])
+        for vert in bm.verts:
+            if vert.index in range(offset, offset + self.vertices_length):
+                for loop in vert.link_loops:
+                    face = loop.face.index
+                    bm.faces[face].material_index = cpt_index_mat
+        cpt_index_mat += 1
+        offset = offset + self.vertices_length
+        return offset, cpt_index_mat
 
     def debug_missing(self):
         keys = [

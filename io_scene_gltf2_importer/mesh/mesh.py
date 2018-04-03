@@ -97,42 +97,20 @@ class Mesh():
         # Normals
         offset = 0
         for prim in self.primitives:
-            if 'NORMAL' in prim.attributes.keys():
-                for poly in mesh.polygons:
-                    for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
-                        vert_idx = mesh.loops[loop_idx].vertex_index
-                        if vert_idx in range(offset, offset + prim.vertices_length):
-                            if offset != 0:
-                                cpt_vert = vert_idx % offset
-                            else:
-                                cpt_vert = vert_idx
-                            mesh.vertices[vert_idx].normal = prim.attributes['NORMAL']['result'][cpt_vert]
-        offset = offset + prim.vertices_length
+            offset = prim.blender_set_normals(mesh, offset)
 
         mesh.update()
 
         # manage UV
         offset = 0
         for prim in self.primitives:
-            for texcoord in [attr for attr in prim.attributes.keys() if attr[:9] == "TEXCOORD_"]:
-                if not texcoord in mesh.uv_textures:
-                    mesh.uv_textures.new(texcoord)
-                    prim.blender_texcoord[int(texcoord[9:])] = texcoord
-
-                for poly in mesh.polygons:
-                    for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
-                        vert_idx = mesh.loops[loop_idx].vertex_index
-                        if vert_idx in range(offset, offset + prim.vertices_length):
-                            obj.data.uv_layers[texcoord].data[loop_idx].uv = Vector((prim.attributes[texcoord]['result'][vert_idx-offset][0], 1-prim.attributes[texcoord]['result'][vert_idx-offset][1]))
-
-            offset = offset + prim.vertices_length
+            offset = prim.blender_set_UV(obj, mesh, offset)
 
         mesh.update()
 
         # Object and UV are now created, we can set UVMap into material
         for prim in self.primitives:
-            if prim.mat.pbr.color_type in [prim.mat.pbr.TEXTURE, prim.mat.pbr.TEXTURE_FACTOR] :
-                prim.mat.set_uvmap(prim, obj)
+            prim.blender_set_UV_in_mat(obj)
 
         # Assign materials to mesh
         offset = 0
@@ -141,14 +119,8 @@ class Mesh():
         bm.from_mesh(obj.data)
         bm.faces.ensure_lookup_table()
         for prim in self.primitives:
-            obj.data.materials.append(bpy.data.materials[prim.mat.blender_material])
-            for vert in bm.verts:
-                if vert.index in range(offset, offset + prim.vertices_length):
-                    for loop in vert.link_loops:
-                        face = loop.face.index
-                        bm.faces[face].material_index = cpt_index_mat
-            cpt_index_mat += 1
-            offset = offset + prim.vertices_length
+            offset, cpt_index_mat = prim.blender_assign_material(obj, bm, offset, cpt_index_mat)
+
         bm.to_mesh(obj.data)
         bm.free()
 
