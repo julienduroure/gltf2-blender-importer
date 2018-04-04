@@ -19,6 +19,9 @@
  *
  * ***** END GPL LICENSE BLOCK *****
  """
+ 
+ from .animation_node import *
+ from .animation_bone import *
 
 class AnimationData():
     def __init__(self, node, gltf):
@@ -52,3 +55,4 @@ class AnimationData():
         else:
             print("Unknown interpolation : " + self.interpolation)
             kf.interpolation = 'BEZIER'
+
