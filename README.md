@@ -11,7 +11,7 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
 
 # What will NOT work (for now, until I implement it)  
 *  samplers in textures
-*  rigging stuff is experimental, but should work 
+*  rigging stuff is experimental, but should work
 *  Camera data (currently only camera type and transforms)
 
 # What should work  
@@ -37,6 +37,8 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
 
 # Thanks
 
+This development is done in strong collaboration with [Airbus Defence & Space][5]
+
 Sources of inspiration / technical stuff:  
 *  [Khronos glTF2 blender exporter][1]
 *  [another gltf2 importer for blender][2]
@@ -47,3 +49,4 @@ Sources of inspiration / technical stuff:
 [2]: https://github.com/ksons/gltf-blender-importer
 [3]: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/figures/gltfOverview-2.0.0a.png
 [4]: https://github.com/KhronosGroup/glTF-Sample-Models
+[5]: http://www.airbus.com/space.html

@@ -18,6 +18,7 @@
  * Contributor(s): Julien Duroure.
  *
  * ***** END GPL LICENSE BLOCK *****
+ * This development is done in strong collaboration with Airbus Defence & Space
  """
 
 from .animation import *
