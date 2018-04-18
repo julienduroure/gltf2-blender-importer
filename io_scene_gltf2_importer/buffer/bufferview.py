@@ -36,8 +36,8 @@ class BufferView():
 
         if self.json['buffer'] not in self.gltf.buffers:
             self.gltf.buffers[self.json['buffer']] = Buffer(self.json['buffer'], self.gltf.json['buffers'][self.json['buffer']], self.gltf)
+            self.gltf.buffers[self.json['buffer']].read()
         self.buffer = self.gltf.buffers[self.json['buffer']]
-        self.buffer.read()
         self.buffer.debug_missing()
 
     def read_data(self, fmt, stride_, count, accessor_offset):
