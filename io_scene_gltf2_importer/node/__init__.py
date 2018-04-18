@@ -126,7 +126,10 @@ class Node():
     def blender_create(self, parent):
         self.parent = parent
         if self.mesh:
-            self.gltf.log.info("Blender create Mesh node " + self.name)
+            if self.name:
+                self.gltf.log.info("Blender create Mesh node " + self.name)
+            else:
+                self.gltf.log.info("Blender create Mesh node")
 
             if self.name:
                 name = self.name
@@ -155,7 +158,10 @@ class Node():
             return
 
         if self.camera:
-            self.gltf.log.info("Blender create Camera node " + self.name)
+            if self.name:
+                self.gltf.log.info("Blender create Camera node " + self.name)
+            else:
+                self.gltf.log.info("Blender create Camera node")
             obj = self.camera.create_blender()
             self.set_transforms(obj) #TODO default rotation of cameras ?
             self.blender_object = obj.name
@@ -165,7 +171,10 @@ class Node():
 
 
         if self.is_joint:
-            self.gltf.log.info("Blender create Bone node " + self.name)
+            if self.name:
+                self.gltf.log.info("Blender create Bone node " + self.name)
+            else:
+                self.gltf.log.info("Blender create Bone node")
             # Check if corresponding armature is already created, create it if needed
             if self.gltf.skins[self.skin_id].blender_armature_name is None:
                 self.gltf.skins[self.skin_id].create_blender_armature(parent)
