@@ -1,6 +1,6 @@
 # glTF2 blender importer
 
-This blender addon is in an early development stage.  
+This blender addon is in an early development stage. It requires blender version 2.79 or higher.
 You will find some bugs, code may need some big refactoring.  
 Feel free to contribute :)  
 Current version may not fully follow glTF2 specification. This will change in near future ;-)

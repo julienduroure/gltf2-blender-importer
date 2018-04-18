@@ -29,11 +29,11 @@ from .io import *
 from .scene import *
 
 bl_info = {
-    "name": "Blender glTF2 importer",
+    "name": "glTF2 importer",
     "version": (0, 0, 1),
     "author": "Julien Duroure",
     "blender": (2, 79, 0),
-    "description": "Blender glTF2 importer",
+    "description": "glTF2 importer",
     "location": "File > Import",
     "category": "Import-Export"
 }
