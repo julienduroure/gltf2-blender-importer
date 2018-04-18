@@ -49,13 +49,16 @@ class ImportglTF2(Operator, ImportHelper):
 
     def import_gltf2(self, context):
         bpy.context.scene.render.engine = 'CYCLES'
+        print("Starting loading glTF file")
         self.gltf = glTFImporter(self.filepath)
         success, txt = self.gltf.read()
         if not success:
             self.report({'ERROR'}, txt)
             return {'CANCELLED'}
+        print("Data are loaded, start creating Blender stuff")
         self.gltf.blender_create()
         self.gltf.debug_missing()
+        print("glTF import is now finished")
 
         return {'FINISHED'}
 
