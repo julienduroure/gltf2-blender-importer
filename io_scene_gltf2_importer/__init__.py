@@ -27,6 +27,7 @@ from bpy.types import Operator
 
 from .io import *
 from .scene import *
+from .util import *
 
 bl_info = {
     "name": "glTF2 importer",
@@ -44,13 +45,15 @@ class ImportglTF2(Operator, ImportHelper):
     bl_idname = 'import_scene.gltf2'
     bl_label  = "Import glTF2"
 
+    loglevel = bpy.props.EnumProperty(items=Log.getLevels(), description="Log Level", default=Log.default())
+
     def execute(self, context):
         return self.import_gltf2(context)
 
     def import_gltf2(self, context):
         bpy.context.scene.render.engine = 'CYCLES'
         print("Starting loading glTF file")
-        self.gltf = glTFImporter(self.filepath)
+        self.gltf = glTFImporter(self.filepath, self.loglevel)
         success, txt = self.gltf.read()
         if not success:
             self.report({'ERROR'}, txt)
