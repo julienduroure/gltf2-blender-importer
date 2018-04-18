@@ -34,10 +34,10 @@ class Scene():
     def read(self):
         if 'name' in self.json.keys():
             self.name = self.json['name']
-            print("Scene " + self.json['name'])
+            self.gltf.log.info("Scene " + self.json['name'])
         else:
             self.name = None
-            print("Scene...")
+            self.gltf.log.info("Scene...")
 
 
         for node_idx in self.json['nodes']:
@@ -91,4 +91,4 @@ class Scene():
 
         for key in self.json.keys():
             if key not in keys:
-                print("SCENE MISSING " + key)
+                self.gltf.log.debug("SCENE MISSING " + key)

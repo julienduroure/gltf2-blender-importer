@@ -47,10 +47,10 @@ class Node():
     def read(self):
         if 'name' in self.json.keys():
             self.name = self.json['name']
-            print("Node " + self.json['name'])
+            self.gltf.log.info("Node " + self.json['name'])
         else:
             self.name = None
-            print("Node index " + str(self.index))
+            self.gltf.log.info("Node index " + str(self.index))
 
         self.transform = self.get_transforms()
 
@@ -121,12 +121,12 @@ class Node():
                     obj.parent = bpy.data.objects[node.blender_object]
                     return
 
-        print("ERROR, parent not found")
+        self.gltf.log.error("ERROR, parent not found")
 
     def blender_create(self, parent):
         self.parent = parent
         if self.mesh:
-            print("Blender create Mesh node " + self.name)
+            self.gltf.log.info("Blender create Mesh node " + self.name)
 
             if self.name:
                 name = self.name
@@ -155,7 +155,7 @@ class Node():
             return
 
         if self.camera:
-            print("Blender create Camera node " + self.name)
+            self.gltf.log.info("Blender create Camera node " + self.name)
             obj = self.camera.create_blender()
             self.set_transforms(obj) #TODO default rotation of cameras ?
             self.blender_object = obj.name
@@ -165,7 +165,7 @@ class Node():
 
 
         if self.is_joint:
-            print("Blender create Bone node " + self.name)
+            self.gltf.log.info("Blender create Bone node " + self.name)
             # Check if corresponding armature is already created, create it if needed
             if self.gltf.skins[self.skin_id].blender_armature_name is None:
                 self.gltf.skins[self.skin_id].create_blender_armature(parent)
@@ -182,10 +182,10 @@ class Node():
         # No mesh, no camera. For now, create empty #TODO
 
         if self.name:
-            print("Blender create Empty node " + self.name)
+            self.gltf.log.info("Blender create Empty node " + self.name)
             obj = bpy.data.objects.new(self.name, None)
         else:
-            print("Blender create Empty node")
+            self.gltf.log.info("Blender create Empty node")
             obj = bpy.data.objects.new("Node", None)
         bpy.data.scenes[self.gltf.blender.scene].objects.link(obj)
         self.set_transforms(obj)
@@ -211,4 +211,4 @@ class Node():
 
         for key in self.json.keys():
             if key not in keys:
-                print("NODE MISSING " + key)
+                self.gltf.log.debug("NODE MISSING " + key)

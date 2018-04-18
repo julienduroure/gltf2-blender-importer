@@ -58,4 +58,4 @@ class Buffer():
 
         for key in self.json.keys():
             if key not in keys:
-                print("BUFFER MISSING " + key)
+                self.gltf.log.debug("BUFFER MISSING " + key)

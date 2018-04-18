@@ -90,4 +90,4 @@ class Accessor():
 
         for key in self.json.keys():
             if key not in keys:
-                print("ACCESSOR MISSING " + key)
+                self.gltf.log.debug("ACCESSOR MISSING " + key)

@@ -87,4 +87,4 @@ class BufferView():
 
         for key in self.json.keys():
             if key not in keys:
-                print("BUFFERVIEW MISSING " + key)
+                self.gltf.log.debug("BUFFERVIEW MISSING " + key)

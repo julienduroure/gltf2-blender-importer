@@ -148,7 +148,7 @@ class Skin():
                                     group.add([vert_idx], weight_val, 'REPLACE')
                                 cpt += 1
             else:
-                print("No Skinning ?????") #TODO
+                self.gltf.log.error("No Skinning ?????") #TODO
 
 
             offset = offset + prim.vertices_length
@@ -178,4 +178,4 @@ class Skin():
 
         for key in self.json.keys():
             if key not in keys:
-                print("SKIN MISSING " + key)
+                self.gltf.log.debug("SKIN MISSING " + key)

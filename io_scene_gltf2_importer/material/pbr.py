@@ -395,4 +395,4 @@ class Pbr():
 
         for key in self.json.keys():
             if key not in keys:
-                print("PBR MISSING " + key)
+                self.gltf.log.debug("PBR MISSING " + key)

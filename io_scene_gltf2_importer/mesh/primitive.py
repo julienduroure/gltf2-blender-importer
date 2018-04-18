@@ -41,7 +41,7 @@ class Primitive():
         # reading attributes
         if 'attributes' in self.json.keys():
             for attr in self.json['attributes'].keys():
-                print("Primitive attribute " + attr)
+                self.gltf.log.debug("Primitive attribute " + attr)
                 self.attributes[attr] = {}
                 self.attributes[attr]['accessor'] = Accessor(self.json['attributes'][attr], self.gltf.json['accessors'][self.json['attributes'][attr]], self.gltf)
                 self.attributes[attr]['result']   = self.attributes[attr]['accessor'].read()
@@ -49,7 +49,7 @@ class Primitive():
 
         # reading indices
         if 'indices' in self.json.keys():
-            print("Primitive indices")
+            self.gltf.log.debug("Primitive indices")
             self.accessor = Accessor(self.json['indices'], self.gltf.json['accessors'][self.json['indices']], self.gltf)
             self.indices  = self.accessor.read()
             self.indices  = [ind[0] for ind in self.indices]
@@ -190,9 +190,9 @@ class Primitive():
 
         for key in self.json.keys():
             if key not in keys:
-                print("PRIMITIVE MISSING " + key)
+                self.gltf.log.debug("PRIMITIVE MISSING " + key)
 
         if 'attributes' in self.json.keys():
             for attr in self.json['attributes'].keys():
                 if attr not in keys_attr:
-                    print("PRIMITIVE MISSING attribute " + attr)
+                    self.gltf.log.debug("PRIMITIVE MISSING attribute " + attr)

@@ -46,7 +46,7 @@ class glTFImporter():
 
         self.convert = Conversion()
 
-        self.log = Log(loglevel)
+        self.log = Log(loglevel).logger
 
         self.buffers = {}
         self.materials = {}
@@ -238,4 +238,4 @@ class glTFImporter():
 
         for key in self.json.keys():
             if key not in keys:
-                print("GLTF MISSING " + key)
+                self.gltf.log.debug("GLTF MISSING " + key)

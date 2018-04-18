@@ -51,4 +51,4 @@ class Map():
 
         for key in self.json.keys():
             if key not in keys:
-                print("MAP MISSING " + key)
+                self.gltf.log.debug("MAP MISSING " + key)

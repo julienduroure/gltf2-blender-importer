@@ -54,5 +54,5 @@ class AnimationData():
         elif interpolation == "CUBICSPLINE":
             kf.interpolation = 'BEZIER' #TODO
         else:
-            print("Unknown interpolation : " + self.interpolation)
+            self.gltf.log.error("Unknown interpolation : " + self.interpolation)
             kf.interpolation = 'BEZIER'

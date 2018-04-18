@@ -92,4 +92,4 @@ class Sparse():
 
         for key in self.json.keys():
             if key not in keys:
-                print("SPARSE MISSING " + key)
+                self.gltf.log.debug("SPARSE MISSING " + key)

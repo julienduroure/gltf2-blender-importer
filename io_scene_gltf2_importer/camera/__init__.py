@@ -81,4 +81,4 @@ class Camera():
 
         for key in self.json.keys():
             if key not in keys:
-                print("CAMERA MISSING " + key)
+                self.gltf.log.debug("CAMERA MISSING " + key)

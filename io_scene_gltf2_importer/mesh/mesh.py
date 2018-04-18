@@ -41,9 +41,9 @@ class Mesh():
     def read(self):
         if 'name' in self.json.keys():
             self.name = self.json['name']
-            print("Mesh " + self.json['name'])
+            self.gltf.log.debug("Mesh " + self.json['name'])
         else:
-            print("Mesh index " + str(self.index))
+            self.gltf.log.debug("Mesh index " + str(self.index))
 
         cpt_idx_prim = 0
         for primitive_it in self.json['primitives']:
@@ -200,4 +200,4 @@ class Mesh():
 
         for key in self.json.keys():
             if key not in keys:
-                print("MESH MISSING " + key)
+                self.gltf.log.debug("MESH MISSING " + key)

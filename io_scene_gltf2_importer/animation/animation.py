@@ -56,7 +56,7 @@ class Animation():
             if node:
                 node.animation.set_anim(channel)
             else:
-                print("ERROR, node not found")
+                self.gltf.log.error("ERROR, node not found")
 
     def debug_missing(self):
         keys = [
@@ -66,4 +66,4 @@ class Animation():
 
         for key in self.json.keys():
             if key not in keys:
-                print("ANIMATION MISSING " + key)
+                self.gltf.log.debug("ANIMATION MISSING " + key)

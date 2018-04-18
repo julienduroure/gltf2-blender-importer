@@ -72,4 +72,4 @@ class Sampler():
 
         for key in self.json.keys():
             if key not in keys:
-                print("SAMPLER CHANNEL MISSING " + key)
+                self.gltf.log.debug("SAMPLER CHANNEL MISSING " + key)
