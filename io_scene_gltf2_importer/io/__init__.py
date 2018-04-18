@@ -40,12 +40,13 @@ class BlenderData():
 
 class glTFImporter():
 
-    def __init__(self, filename):
+    def __init__(self, filename, loglevel):
         self.filename = filename
         self.other_scenes = []
 
         self.convert = Conversion()
 
+        self.log = Log(loglevel)
 
         self.buffers = {}
         self.materials = {}
