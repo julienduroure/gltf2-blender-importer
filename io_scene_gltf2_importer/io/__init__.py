@@ -238,4 +238,4 @@ class glTFImporter():
 
         for key in self.json.keys():
             if key not in keys:
-                self.gltf.log.debug("GLTF MISSING " + key)
+                self.log.debug("GLTF MISSING " + key)
