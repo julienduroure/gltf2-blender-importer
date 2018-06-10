@@ -117,6 +117,11 @@ class Node():
 
         for node in self.gltf.scene.nodes.values(): # TODO if parent is in another scene
             if node.index == parent:
+                if node.is_joint == True:
+                    obj.parent = bpy.data.objects[node.blender_armature_name]
+                    obj.parent_type = 'BONE'
+                    obj.parent_bone = node.blender_bone_name
+                    return
                 if node.blender_object:
                     obj.parent = bpy.data.objects[node.blender_object]
                     return

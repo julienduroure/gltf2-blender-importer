@@ -103,6 +103,7 @@ class Skin():
 
         bone = obj.data.edit_bones.new(name)
         node.blender_bone_name = bone.name
+        node.blender_armature_name = self.blender_armature_name
         bone.tail = Vector((0.0,1.0,0.0)) # Needed to keep bone alive
         mat = self.set_bone_transforms(bone, node, parent)
         node.blender_bone_matrix = mat
