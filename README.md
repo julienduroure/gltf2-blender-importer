@@ -9,6 +9,16 @@ Current version may not fully follow glTF2 specification. This will change in ne
 
 Easier way to install this addon is to zip the io_scene_gltf2 directory, and to install this zip file as any other blender addons.
 
+# Examples
+
+![](doc/BoomBox.png)  
+
+![](doc/CesiumMan.png)  
+
+![](doc/FlightHelmet.png)
+
+(These glTF files are from [glTF samples][https://github.com/KhronosGroup/glTF-Sample-Models])
+
 # What will NOT work (for now, until I implement it)  
 *  samplers in textures
 *  rigging stuff is experimental, but should work
