@@ -17,7 +17,7 @@ Easier way to install this addon is to zip the io_scene_gltf2 directory, and to 
 
 ![](doc/FlightHelmet.png)
 
-(These glTF files are from [glTF samples][https://github.com/KhronosGroup/glTF-Sample-Models])
+(These glTF files are from [glTF samples](https://github.com/KhronosGroup/glTF-Sample-Models))
 
 # What will NOT work (for now, until I implement it)  
 *  samplers in textures
