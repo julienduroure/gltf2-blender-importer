@@ -55,6 +55,9 @@ Sources of inspiration / technical stuff:
 *  [Overwiew of specification][3]
 *  [glTF2 samples][4]
 
+# Releases
+*  v0.0.1: First release. [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.1/io_scene_gltf2_importer.zip)
+
 [1]: https://github.com/KhronosGroup/glTF-Blender-Exporter
 [2]: https://github.com/ksons/gltf-blender-importer
 [3]: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/figures/gltfOverview-2.0.0a.png
