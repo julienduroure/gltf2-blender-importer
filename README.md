@@ -7,7 +7,7 @@ Current version may not fully follow glTF2 specification. This will change in ne
 
 # Installation
 
-Easier way to install this addon is to zip the io_scene_gltf2 directory, and to install this zip file as any other blender addons.
+Download current release [here](https://github.com/julienduroure/gltf2-blender-importer/releases) and install this zip file as any other blender addons.
 
 # Examples
 
