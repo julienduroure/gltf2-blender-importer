@@ -62,6 +62,7 @@ class ImportglTF2(Operator, ImportHelper):
         self.gltf.blender_create()
         self.gltf.debug_missing()
         self.gltf.log.critical("glTF import is now finished")
+        self.gltf.log.removeHandler(self.gltf.log_handler)
 
         return {'FINISHED'}
 

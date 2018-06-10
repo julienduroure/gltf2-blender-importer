@@ -3,10 +3,10 @@ import logging
 class Log():
     def __init__(self, loglevel):
         self.logger = logging.getLogger('glTFImporter')
-        hdlr = logging.StreamHandler()
+        self.hdlr = logging.StreamHandler()
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-        hdlr.setFormatter(formatter)
-        self.logger.addHandler(hdlr)
+        self.hdlr.setFormatter(formatter)
+        self.logger.addHandler(self.hdlr)
         self.logger.setLevel(int(loglevel))
 
     def getLevels():

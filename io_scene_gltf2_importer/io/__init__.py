@@ -46,7 +46,9 @@ class glTFImporter():
 
         self.convert = Conversion()
 
-        self.log = Log(loglevel).logger
+        log = Log(loglevel)
+        self.log = log.logger
+        self.log_handler = log.hdlr
 
         self.buffers = {}
         self.materials = {}
