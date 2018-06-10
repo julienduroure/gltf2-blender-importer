@@ -201,6 +201,7 @@ class Node():
         else:
             self.gltf.log.info("Blender create Empty node")
             obj = bpy.data.objects.new("Node", None)
+        obj.rotation_mode = 'QUATERNION'
         bpy.data.scenes[self.gltf.blender.scene].objects.link(obj)
         self.set_transforms(obj)
         self.blender_object = obj.name
