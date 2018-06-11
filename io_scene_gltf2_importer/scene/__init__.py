@@ -80,8 +80,22 @@ class Scene():
         for armature in self.gltf.skins.values():
             armature.create_armature_modifiers()
 
+        # strange bug that create some animation on armatures ... Very strange. Delete them for now
+        self.blender_anim_armature_clear()
 
     # TODO create blender for other scenes
+
+
+    def blender_anim_armature_clear(self):
+        for obj in [obj for obj in bpy.data.objects if obj.type == "ARMATURE"]:
+            if not obj.animation_data and obj.animation_data.action:
+                continue
+            fcurves = obj.animation_data.action.fcurves
+            for fcurve in fcurves:
+                if fcurve.data_path[:12] == "pose.bones[\"":
+                    continue
+                # delete channel
+                fcurves.remove(fcurve)
 
     def debug_missing(self):
         keys = [
