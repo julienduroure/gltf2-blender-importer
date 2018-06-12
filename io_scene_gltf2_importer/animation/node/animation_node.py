@@ -34,16 +34,14 @@ class AnimationNode():
         fps = bpy.context.scene.render.fps
 
         for anim in self.animation.anims.keys():
-            if not self.animation.gltf.animations[anim].blender_action:
-                if self.animation.gltf.animations[anim].name:
-                    name = self.animation.gltf.animations[anim].name
-                else:
-                    name = "self.animation_" + str(self.animation.gltf.animations[anim].index)
-                action = bpy.data.actions.new(name)
-                self.animation.gltf.animations[anim].blender_action = action.name
+            if self.animation.gltf.animations[anim].name:
+                name = self.animation.gltf.animations[anim].name + "_" + obj.name
+            else:
+                name = "self.animation_" + str(self.animation.gltf.animations[anim].index) + "_" + obj.name
+            action = bpy.data.actions.new(name)
             if not obj.animation_data:
                 obj.animation_data_create()
-            obj.animation_data.action = bpy.data.actions[self.animation.gltf.animations[anim].blender_action]
+            obj.animation_data.action = bpy.data.actions[action.name]
 
             for channel in self.animation.anims[anim]:
                 if channel.path in ['translation', 'rotation', 'scale']:

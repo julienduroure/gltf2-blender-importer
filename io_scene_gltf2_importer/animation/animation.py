@@ -31,7 +31,6 @@ class Animation():
         self.name  = None
 
         self.channels = []
-        self.blender_action = None
 
     def read(self):
         if not 'channels' in self.json.keys():

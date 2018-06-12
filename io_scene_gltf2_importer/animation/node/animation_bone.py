@@ -35,16 +35,17 @@ class AnimationBone():
         delta = Quaternion((0.7071068286895752, 0.7071068286895752, 0.0, 0.0))
 
         for anim in self.animation.anims.keys():
-            if not self.animation.gltf.animations[anim].blender_action:
-                if self.animation.gltf.animations[anim].name:
-                    name = self.animation.gltf.animations[anim].name
-                else:
-                    name = "Animation_" + str(self.animation.gltf.animations[anim].index)
+            if self.animation.gltf.animations[anim].name:
+                name = self.animation.gltf.animations[anim].name + "_" + obj.name
+            else:
+                name = "Animation_" + str(self.animation.gltf.animations[anim].index) + "_" + obj.name
+            if name not in bpy.data.actions:
                 action = bpy.data.actions.new(name)
-                self.animation.gltf.animations[anim].blender_action = action.name
+            else:
+                action = bpy.data.actions[name]
             if not obj.animation_data:
                 obj.animation_data_create()
-            obj.animation_data.action = bpy.data.actions[self.animation.gltf.animations[anim].blender_action]
+            obj.animation_data.action = bpy.data.actions[action.name]
 
             for channel in self.animation.anims[anim]:
                 if channel.path == "translation":
