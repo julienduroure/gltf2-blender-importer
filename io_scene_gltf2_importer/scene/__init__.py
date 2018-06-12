@@ -96,6 +96,7 @@ class Scene():
                     continue
                 # delete channel
                 fcurves.remove(fcurve)
+            obj.matrix_world = Matrix().to_4x4() #TODO: check if these should be at 0.0 or something else (parenting?)
 
     def debug_missing(self):
         keys = [
