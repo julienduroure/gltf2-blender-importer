@@ -44,6 +44,9 @@ class AnimationData():
         else:
             self.node_anim.anim()
 
+        for child in self.node.children:
+            child.animation.blender_anim()
+
     def set_interpolation(self, interpolation, kf):
         if interpolation == "LINEAR":
             kf.interpolation = 'LINEAR'

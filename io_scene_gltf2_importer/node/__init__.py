@@ -181,7 +181,6 @@ class Node():
             for child in self.children:
                 child.blender_create(self.index)
 
-            self.animation.blender_anim()
             return
 
         if self.camera:
@@ -208,8 +207,6 @@ class Node():
 
             self.gltf.skins[self.skin_id].create_bone(self, parent)
 
-            self.animation.blender_anim()
-
             for child in self.children:
                 child.blender_create(self.index)
 
@@ -228,7 +225,6 @@ class Node():
         self.set_transforms(obj, parent)
         self.blender_object = obj.name
         self.set_blender_parent(obj, parent)
-        self.animation.blender_anim()
 
         for child in self.children:
             child.blender_create(self.index)

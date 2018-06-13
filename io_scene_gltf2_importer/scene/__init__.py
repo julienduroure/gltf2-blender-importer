@@ -80,6 +80,11 @@ class Scene():
         for armature in self.gltf.skins.values():
             armature.create_armature_modifiers()
 
+        for node in self.nodes.values():
+            if node.root:
+                node.animation.blender_anim()
+
+
     # TODO create blender for other scenes
 
 
