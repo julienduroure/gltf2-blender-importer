@@ -75,8 +75,7 @@ class Skin():
         else:
             if not self.gltf.scene.nodes[parent].is_joint: # TODO if Node in another scene
                 transform  = node.get_transforms()
-                parent_mat = bpy.data.objects[self.gltf.scene.nodes[parent].blender_object].matrix_world
-                mat = transform * parent_mat.inverted()
+                mat = transform * delta.to_matrix().to_4x4()
             else:
                 transform = node.get_transforms()
                 parent_mat = obj.data.edit_bones[self.gltf.scene.nodes[parent].blender_bone_name].matrix # Node in another scene

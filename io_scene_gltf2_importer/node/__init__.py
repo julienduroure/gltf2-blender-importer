@@ -106,8 +106,21 @@ class Node():
         return mat
 
 
-    def set_transforms(self, obj):
-        obj.matrix_world =  self.transform
+    def set_transforms(self, obj, parent):
+        if parent is None:
+            obj.matrix_world =  self.transform
+            return
+
+        for node in self.gltf.scene.nodes.values(): # TODO if parent is in another scene
+            if node.index == parent:
+                if node.is_joint == True:
+                    delta = Quaternion((0.7071068286895752, 0.7071068286895752, 0.0, 0.0))
+                    obj.matrix_world = self.transform * delta.inverted().to_matrix().to_4x4()
+                    return
+                else:
+                    obj.matrix_world = self.transform
+                    return
+
 
 
     def set_blender_parent(self, obj, parent):
@@ -159,7 +172,7 @@ class Node():
             obj = bpy.data.objects.new(name, mesh)
             obj.rotation_mode = 'QUATERNION'
             bpy.data.scenes[self.gltf.blender.scene].objects.link(obj)
-            self.set_transforms(obj)
+            self.set_transforms(obj, parent)
             self.blender_object = obj.name
             self.set_blender_parent(obj, parent)
 
@@ -177,7 +190,7 @@ class Node():
             else:
                 self.gltf.log.info("Blender create Camera node")
             obj = self.camera.create_blender()
-            self.set_transforms(obj) #TODO default rotation of cameras ?
+            self.set_transforms(obj, parent) #TODO default rotation of cameras ?
             self.blender_object = obj.name
             self.set_blender_parent(obj, parent)
 
@@ -212,7 +225,7 @@ class Node():
             obj = bpy.data.objects.new("Node", None)
         obj.rotation_mode = 'QUATERNION'
         bpy.data.scenes[self.gltf.blender.scene].objects.link(obj)
-        self.set_transforms(obj)
+        self.set_transforms(obj, parent)
         self.blender_object = obj.name
         self.set_blender_parent(obj, parent)
         self.animation.blender_anim()
