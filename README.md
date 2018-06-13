@@ -7,7 +7,8 @@ Current version may not fully follow glTF2 specification. This will change in ne
 
 # Installation
 
-Download current release [here](https://github.com/julienduroure/gltf2-blender-importer/releases) and install this zip file as any other blender addons.
+Download current release [here](https://github.com/julienduroure/gltf2-blender-importer/releases) and install this zip file as any other blender addons.  
+If you want to get very last features/bug corrections, you can create a zip file from the repository.
 
 # Examples
 
@@ -61,6 +62,7 @@ Sources of inspiration / technical stuff:
   *  Don't hesitate to contact me, you will find my email and phone number on my [website](http://julienduroure.com).
 
 # Releases
+*  v0.0.2: Fix animation stuff. [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.2/io_scene_gltf2_importer.zip)
 *  v0.0.1: First release. [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.1/io_scene_gltf2_importer.zip)
 
 [1]: https://github.com/KhronosGroup/glTF-Blender-Exporter
