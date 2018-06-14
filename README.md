@@ -24,6 +24,8 @@ If you want to get very last features/bug corrections, you can create a zip file
 *  samplers in textures
 *  rigging stuff is experimental, but should work
 *  Camera data (currently only camera type and transforms)
+*  KHR_materials_pbrSpecularGlossiness extension
+    *  alpha is not taken into account yet (WIP)
 
 # What should work  
 *  files  
@@ -45,6 +47,7 @@ If you want to get very last features/bug corrections, you can create a zip file
     *  Roughness map
     *  Emissive map
     *  Normal map
+*  KHR_materials_pbrSpecularGlossiness extension (WIP, not released yet)
 
 # Thanks
 
