@@ -57,6 +57,10 @@ class glTFImporter():
         self.images = {}
         self.animations = {}
 
+        self.extensions_managed = [
+
+        ]
+
         self.load()
 
         self.blender = BlenderData()
@@ -155,6 +159,18 @@ class glTFImporter():
         idx, scene = self.get_root_scene()
         if not scene:
             return False, "Error reading root scene"
+
+        if 'extensionsRequired' in self.json.keys():
+            for ext in self.json['extensionsRequired']:
+                if ext not in self.extensions_managed:
+                    return False, "Extension " + ext + " is not available on this addon version"
+
+        if 'extensionsUsed' in self.json.keys():
+            for ext in self.json['extensionsUsed']:
+                if ext not in self.extensions_managed:
+                    self.log.error("Extension " + ext + " is not available on this addon version")
+                    # Non blocking error
+
         self.scene = Scene(idx, scene, self)
         self.scene.read()
         self.scene.debug_missing()
