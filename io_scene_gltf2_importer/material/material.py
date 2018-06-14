@@ -24,6 +24,7 @@
 import bpy
 from .pbr import *
 from .map import *
+from .extensions import *
 
 class Material():
     def __init__(self, index, json, gltf):
@@ -47,6 +48,12 @@ class Material():
             self.pbr.debug_missing()
             self.name = "Default Material"
             return
+
+        if 'extensions' in self.json.keys():
+            if 'KHR_materials_pbrSpecularGlossiness' in self.json['extensions'].keys():
+                self.KHR_materials_pbrSpecularGlossiness = KHR_materials_pbrSpecularGlossiness(self.json['extensions']['KHR_materials_pbrSpecularGlossiness'], self.gltf)
+                self.KHR_materials_pbrSpecularGlossiness.read()
+                self.KHR_materials_pbrSpecularGlossiness.debug_missing()
 
         # Not default material
         if 'name' in self.json.keys():
@@ -83,7 +90,10 @@ class Material():
             self.occlusionmap.debug_missing()
 
     def use_vertex_color(self):
-        self.pbr.use_vertex_color()
+        if hasattr(self, 'KHR_materials_pbrSpecularGlossiness'):
+            self.KHR_materials_pbrSpecularGlossiness.use_vertex_color()
+        else:
+            self.pbr.use_vertex_color()
 
     def create_blender(self):
         if self.name is not None:
@@ -94,8 +104,11 @@ class Material():
         mat = bpy.data.materials.new(name)
         self.blender_material = mat.name
 
-        # create pbr material
-        self.pbr.create_blender(mat.name)
+        if hasattr(self, 'KHR_materials_pbrSpecularGlossiness'):
+            self.KHR_materials_pbrSpecularGlossiness.create_blender(mat.name)
+        else:
+            # create pbr material
+            self.pbr.create_blender(mat.name)
 
         # add emission map if needed
         if self.emissivemap:

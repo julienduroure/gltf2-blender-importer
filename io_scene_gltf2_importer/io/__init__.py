@@ -58,7 +58,7 @@ class glTFImporter():
         self.animations = {}
 
         self.extensions_managed = [
-
+            "KHR_materials_pbrSpecularGlossiness"
         ]
 
         self.load()

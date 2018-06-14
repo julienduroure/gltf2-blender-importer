@@ -157,8 +157,19 @@ class Primitive():
         return offset
 
     def blender_set_UV_in_mat(self, obj):
-        if self.mat.pbr.color_type in [self.mat.pbr.TEXTURE, self.mat.pbr.TEXTURE_FACTOR] :
-            self.mat.set_uvmap(self, obj)
+        if hasattr(self.mat, "KHR_materials_pbrSpecularGlossiness"):
+            if self.mat.KHR_materials_pbrSpecularGlossiness.diffuse_type in [self.mat.KHR_materials_pbrSpecularGlossiness.TEXTURE, self.mat.KHR_materials_pbrSpecularGlossiness.TEXTURE_FACTOR]:
+                self.mat.set_uvmap(self, obj)
+            else:
+                if self.mat.KHR_materials_pbrSpecularGlossiness.specgloss_type in [self.mat.KHR_materials_pbrSpecularGlossiness.TEXTURE, self.mat.KHR_materials_pbrSpecularGlossiness.TEXTURE_FACTOR]:
+                    self.mat.set_uvmap(self, obj)
+
+        else:
+            if self.mat.pbr.color_type in [self.mat.pbr.TEXTURE, self.mat.pbr.TEXTURE_FACTOR] :
+                self.mat.set_uvmap(self, obj)
+            else:
+                if self.mat.pbr.metallic_type in [self.mat.pbr.TEXTURE, self.mat.pbr.TEXTURE_FACTOR] :
+                    self.mat.set_uvmap(self, obj)
 
     def blender_assign_material(self, obj, bm, offset, cpt_index_mat):
         obj.data.materials.append(bpy.data.materials[self.mat.blender_material])
