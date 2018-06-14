@@ -69,6 +69,11 @@ class KHR_materials_pbrSpecularGlossiness():
             self.specularGlossinessTexture.read()
             self.specularGlossinessTexture.debug_missing()
 
+            if 'texCoord' in self.json['specularGlossinessTexture']:
+                self.specularGlossinessTexture.texcoord = int(self.json['specularGlossinessTexture']['texCoord'])
+            else:
+                self.specularGlossinessTexture.texcoord = 0
+
         if 'glossinessFactor' in self.json.keys():
             self.glossinessFactor = self.json['glossinessFactor']
 
@@ -290,6 +295,85 @@ class KHR_materials_pbrSpecularGlossiness():
             node_tree.links.new(text_node.inputs[0], mapping.outputs[0])
 
 
+        if self.specgloss_type == self.SIMPLE:
+            spec_convert = node_tree.nodes.new('ShaderNodeRGBToBW')
+            spec_convert.location = -250,0
+
+            color = node_tree.nodes.new('ShaderNodeRGB')
+            color.location = -500,0
+            val = self.specularFactor
+            val.extend([1.0])
+            color.outputs[0].default_value = val
+
+            node_tree.links.new(spec_convert.inputs[0], color.outputs[0])
+            node_tree.links.new(principled.inputs[5], spec_convert.outputs[0])
+
+        elif self.specgloss_type == self.TEXTURE:
+            self.specularGlossinessTexture.blender_create()
+            spec_text = node_tree.nodes.new('ShaderNodeTexImage')
+            spec_text.image = bpy.data.images[self.specularGlossinessTexture.image.blender_image_name]
+            spec_text.color_space = 'NONE'
+            spec_text.location = -500,0
+
+            spec_convert = node_tree.nodes.new('ShaderNodeRGBToBW')
+            spec_convert.location = -250,0
+
+            spec_mapping = node_tree.nodes.new('ShaderNodeMapping')
+            spec_mapping.location = -1000,0
+
+            spec_uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            spec_uvmap.location = -1500,0
+            spec_uvmap["gltf2_texcoord"] = self.specularGlossinessTexture.texcoord # Set custom flag to retrieve TexCoord
+
+            # links
+            node_tree.links.new(spec_convert.inputs[0], spec_text.outputs[0])
+            node_tree.links.new(principled.inputs[5], spec_convert.outputs[0])
+
+            node_tree.links.new(spec_mapping.inputs[0], spec_uvmap.outputs[0])
+            node_tree.links.new(spec_text.inputs[0], spec_mapping.outputs[0])
+
+        elif self.specgloss_type == self.TEXTURE_FACTOR:
+
+            self.specularGlossinessTexture.blender_create()
+
+            spec_text = node_tree.nodes.new('ShaderNodeTexImage')
+            spec_text.image = bpy.data.images[self.specularGlossinessTexture.image.blender_image_name]
+            spec_text.color_space = 'NONE'
+            spec_text.location = -1000,0
+
+            color = node_tree.nodes.new('ShaderNodeRGB')
+            color.location = -500,0
+            val = self.specularFactor
+            val.extend([1.0])
+            color.outputs[0].default_value = val
+
+            spec_convert = node_tree.nodes.new('ShaderNodeRGBToBW')
+            spec_convert.location = -500,100
+
+            spec_math     = node_tree.nodes.new('ShaderNodeMath')
+            spec_math.operation = 'MULTIPLY'
+            spec_math.location = -250,100
+
+            spec_mapping = node_tree.nodes.new('ShaderNodeMapping')
+            spec_mapping.location = -1000,0
+
+            spec_uvmap = node_tree.nodes.new('ShaderNodeUVMap')
+            spec_uvmap.location = -1500,0
+            spec_uvmap["gltf2_texcoord"] = self.specularGlossinessTexture.texcoord # Set custom flag to retrieve TexCoord
+
+
+            # links
+            node_tree.links.new(spec_convert.inputs[0], spec_text.outputs[0])
+
+            node_tree.links.new(spec_math.inputs[0], spec_convert.outputs[0])
+            node_tree.links.new(spec_math.inputs[1], color.outputs[0])
+            node_tree.links.new(principled.inputs[5], spec_math.outputs[0])
+
+            node_tree.links.new(spec_mapping.inputs[0], spec_uvmap.outputs[0])
+            node_tree.links.new(spec_text.inputs[0], spec_mapping.outputs[0])
+
+        # link node to output
+        node_tree.links.new(output_node.inputs[0], principled.outputs[0])
 
 
     def debug_missing(self):
