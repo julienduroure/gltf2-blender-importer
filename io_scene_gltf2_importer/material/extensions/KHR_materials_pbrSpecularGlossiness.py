@@ -107,15 +107,19 @@ class KHR_materials_pbrSpecularGlossiness():
         output_node.location = 1000,0
 
         # create PBR node
-        principled = node_tree.nodes.new('ShaderNodeBsdfPrincipled')
-        principled.location = 0,0
+        diffuse    = node_tree.nodes.new('ShaderNodeBsdfDiffuse')
+        diffuse.location = 0,0
+        glossy     = node_tree.nodes.new('ShaderNodeBsdfGlossy')
+        glossy.location  = 0,100
+        mix        = node_tree.nodes.new('ShaderNodeMixShader')
+        mix.location     = 500,0
 
-        principled.inputs[7].default_value = 1 - self.glossinessFactor
+        glossy.inputs[1].default_value = 1 - self.glossinessFactor
 
         if self.diffuse_type == self.SIMPLE:
             if not self.vertex_color:
                 # change input values
-                principled.inputs[0].default_value = self.diffuseFactor
+                diffuse.inputs[0].default_value = self.diffuseFactor
 
             else:
                 # Create attribute node to get COLOR_0 data
@@ -124,7 +128,7 @@ class KHR_materials_pbrSpecularGlossiness():
                 attribute_node.location = -500,0
 
                 # links
-                node_tree.links.new(principled.inputs[0], attribute_node.outputs[1])
+                node_tree.links.new(diffuse.inputs[0], attribute_node.outputs[1])
 
         elif self.diffuse_type == self.TEXTURE_FACTOR:
 
@@ -209,7 +213,7 @@ class KHR_materials_pbrSpecularGlossiness():
             node_tree.links.new(separate.inputs[0], text_node.outputs[0])
 
 
-            node_tree.links.new(principled.inputs[0], combine.outputs[0])
+            node_tree.links.new(diffuse.inputs[0], combine.outputs[0])
 
         elif self.diffuse_type == self.TEXTURE:
 
@@ -287,7 +291,7 @@ class KHR_materials_pbrSpecularGlossiness():
                 node_tree.links.new(math_vc_B.inputs[0], separate.outputs[2])
 
             else:
-                node_tree.links.new(principled.inputs[0], text_node.outputs[0])
+                node_tree.links.new(diffuse.inputs[0], text_node.outputs[0])
 
             # Common for both mode (non vertex color / vertex color)
 
@@ -296,17 +300,14 @@ class KHR_materials_pbrSpecularGlossiness():
 
 
         if self.specgloss_type == self.SIMPLE:
-            spec_convert = node_tree.nodes.new('ShaderNodeRGBToBW')
-            spec_convert.location = -250,0
 
-            color = node_tree.nodes.new('ShaderNodeRGB')
-            color.location = -500,0
-            val = self.specularFactor
-            val.extend([1.0])
-            color.outputs[0].default_value = val
+            combine = node_tree.nodes.new('ShaderNodeCombineRGB')
+            combine.inputs[0].default_value = self.specularFactor[0]
+            combine.inputs[1].default_value = self.specularFactor[1]
+            combine.inputs[2].default_value = self.specularFactor[2]
 
-            node_tree.links.new(spec_convert.inputs[0], color.outputs[0])
-            node_tree.links.new(principled.inputs[5], spec_convert.outputs[0])
+            # links
+            node_tree.links.new(glossy.inputs[0], combine.outputs[0])
 
         elif self.specgloss_type == self.TEXTURE:
             self.specularGlossinessTexture.blender_create()
@@ -314,9 +315,6 @@ class KHR_materials_pbrSpecularGlossiness():
             spec_text.image = bpy.data.images[self.specularGlossinessTexture.image.blender_image_name]
             spec_text.color_space = 'NONE'
             spec_text.location = -500,0
-
-            spec_convert = node_tree.nodes.new('ShaderNodeRGBToBW')
-            spec_convert.location = -250,0
 
             spec_mapping = node_tree.nodes.new('ShaderNodeMapping')
             spec_mapping.location = -1000,0
@@ -326,8 +324,8 @@ class KHR_materials_pbrSpecularGlossiness():
             spec_uvmap["gltf2_texcoord"] = self.specularGlossinessTexture.texcoord # Set custom flag to retrieve TexCoord
 
             # links
-            node_tree.links.new(spec_convert.inputs[0], spec_text.outputs[0])
-            node_tree.links.new(principled.inputs[5], spec_convert.outputs[0])
+            node_tree.links.new(glossy.inputs[0], spec_text.outputs[0])
+            node_tree.links.new(mix.inputs[0], spec_text.outputs[1])
 
             node_tree.links.new(spec_mapping.inputs[0], spec_uvmap.outputs[0])
             node_tree.links.new(spec_text.inputs[0], spec_mapping.outputs[0])
@@ -341,17 +339,9 @@ class KHR_materials_pbrSpecularGlossiness():
             spec_text.color_space = 'NONE'
             spec_text.location = -1000,0
 
-            color = node_tree.nodes.new('ShaderNodeRGB')
-            color.location = -500,0
-            val = self.specularFactor
-            val.extend([1.0])
-            color.outputs[0].default_value = val
-
-            spec_convert = node_tree.nodes.new('ShaderNodeRGBToBW')
-            spec_convert.location = -500,100
-
             spec_math     = node_tree.nodes.new('ShaderNodeMath')
             spec_math.operation = 'MULTIPLY'
+            spec_math.inputs[0].default_value = self.glossinessFactor
             spec_math.location = -250,100
 
             spec_mapping = node_tree.nodes.new('ShaderNodeMapping')
@@ -363,17 +353,19 @@ class KHR_materials_pbrSpecularGlossiness():
 
 
             # links
-            node_tree.links.new(spec_convert.inputs[0], spec_text.outputs[0])
 
-            node_tree.links.new(spec_math.inputs[0], spec_convert.outputs[0])
-            node_tree.links.new(spec_math.inputs[1], color.outputs[0])
-            node_tree.links.new(principled.inputs[5], spec_math.outputs[0])
+            node_tree.links.new(spec_math.inputs[1], spec_text.outputs[0])
+            node_tree.links.new(mix.inputs[0], spec_text.outputs[1])
+            node_tree.links.new(glossy.inputs[1], spec_math.outputs[0])
+            node_tree.links.new(glossy.inputs[0], spec_text.outputs[0])
 
             node_tree.links.new(spec_mapping.inputs[0], spec_uvmap.outputs[0])
             node_tree.links.new(spec_text.inputs[0], spec_mapping.outputs[0])
 
         # link node to output
-        node_tree.links.new(output_node.inputs[0], principled.outputs[0])
+        node_tree.links.new(mix.inputs[2], diffuse.outputs[0])
+        node_tree.links.new(mix.inputs[1], glossy.outputs[0])
+        node_tree.links.new(output_node.inputs[0], mix.outputs[0])
 
 
     def debug_missing(self):

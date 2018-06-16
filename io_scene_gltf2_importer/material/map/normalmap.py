@@ -41,7 +41,15 @@ class NormalMap(Map):
         self.texture.blender_create()
 
         # retrieve principled node and output node
-        principled = [node for node in node_tree.nodes if node.type == "BSDF_PRINCIPLED"][0]
+        principled = None
+        diffuse   = None
+        glossy    = None
+        if len([node for node in node_tree.nodes if node.type == "BSDF_PRINCIPLED"]) != 0:
+            principled = [node for node in node_tree.nodes if node.type == "BSDF_PRINCIPLED"][0]
+        else:
+            #No principled, we are probably coming from extension
+            diffuse = [node for node in node_tree.nodes if node.type == "BSDF_DIFFUSE"][0]
+            glossy  = [node for node in node_tree.nodes if node.type == "BSDF_GLOSSY"][0]
 
         # add nodes
         mapping = node_tree.nodes.new('ShaderNodeMapping')
@@ -65,4 +73,9 @@ class NormalMap(Map):
         node_tree.links.new(normalmap_node.inputs[1], text.outputs[0])
 
         # following  links will modify PBR node tree
-        node_tree.links.new(principled.inputs[17], normalmap_node.outputs[0])
+        if principled:
+            node_tree.links.new(principled.inputs[17], normalmap_node.outputs[0])
+        if diffuse:
+            node_tree.links.new(diffuse.inputs[2], normalmap_node.outputs[0])
+        if glossy:
+            node_tree.links.new(glossy.inputs[2], normalmap_node.outputs[0])

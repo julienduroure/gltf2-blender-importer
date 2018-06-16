@@ -41,7 +41,12 @@ class EmissiveMap(Map):
         self.texture.blender_create()
 
         # retrieve principled node and output node
-        principled = [node for node in node_tree.nodes if node.type == "BSDF_PRINCIPLED"][0]
+        if len([node for node in node_tree.nodes if node.type == "BSDF_PRINCIPLED"]) != 0:
+            fix = [node for node in node_tree.nodes if node.type == "BSDF_PRINCIPLED"][0]
+        else:
+            # No principled, we are coming from an extenstion, probably
+            fix = [node for node in node_tree.nodes if node.type == "MIX_SHADER"][0]
+
         output = [node for node in node_tree.nodes if node.type == 'OUTPUT_MATERIAL'][0]
 
         # add nodes
@@ -92,5 +97,5 @@ class EmissiveMap(Map):
 
         # following  links will modify PBR node tree
         node_tree.links.new(add.inputs[0], emit.outputs[0])
-        node_tree.links.new(add.inputs[1], principled.outputs[0])
+        node_tree.links.new(add.inputs[1], fix.outputs[0])
         node_tree.links.new(output.inputs[0], add.outputs[0])
