@@ -25,7 +25,7 @@ import bpy
 import os
 import base64
 import tempfile
-from os.path import dirname, join
+from os.path import dirname, join, isfile
 from ..buffer import *
 
 class Image():
@@ -47,8 +47,12 @@ class Image():
                     self.data = base64.b64decode(data)
                     return
 
-            with open(join(dirname(self.gltf.filename), self.json['uri']), 'rb') as f_:
-                self.data = f_.read()
+            if isfile(join(dirname(self.gltf.filename), self.json['uri'])):
+                with open(join(dirname(self.gltf.filename), self.json['uri']), 'rb') as f_:
+                    self.data = f_.read()
+                    return
+            else:
+                self.gltf.log.error("Missing file (index " + str(self.index) + "): " + self.json['uri'])
                 return
 
         if 'bufferView' not in self.json.keys():
