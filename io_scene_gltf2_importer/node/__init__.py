@@ -167,7 +167,7 @@ class Node():
                 else:
                     name = "Object_" + str(self.index)
 
-            mesh = self.mesh.blender_create()
+            mesh = self.mesh.blender_create(parent)
 
             obj = bpy.data.objects.new(name, mesh)
             obj.rotation_mode = 'QUATERNION'

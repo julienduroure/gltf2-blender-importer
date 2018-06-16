@@ -68,7 +68,7 @@ class Mesh():
         else:
             self.skin = self.gltf.skins[skin_id]
 
-    def blender_create(self):
+    def blender_create(self, parent):
         # Check if the mesh is rigged, and create armature if needed
         if self.skin:
             if self.skin.blender_armature_name is None:
