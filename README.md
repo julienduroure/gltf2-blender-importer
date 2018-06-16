@@ -47,7 +47,7 @@ If you want to get very last features/bug corrections, you can create a zip file
     *  Roughness map
     *  Emissive map
     *  Normal map
-*  KHR_materials_pbrSpecularGlossiness extension (WIP, not released yet)
+*  KHR_materials_pbrSpecularGlossiness extension (experimental)
 
 # Thanks
 
@@ -65,6 +65,10 @@ Sources of inspiration / technical stuff:
   *  Don't hesitate to contact me, you will find my email and phone number on my [website](http://julienduroure.com).
 
 # Releases
+*  v0.0.3:
+  *  Experimental use of KHR_materials_pbrSpecularGlossiness
+  *  Fix bug when a texture file is missing
+  *  Fix bug with armature parenting
 *  v0.0.2: Fix animation stuff. [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.2/io_scene_gltf2_importer.zip)
 *  v0.0.1: First release. [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.1/io_scene_gltf2_importer.zip)
 
