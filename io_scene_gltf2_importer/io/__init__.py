@@ -56,6 +56,7 @@ class glTFImporter():
         self.skins = {}
         self.images = {}
         self.animations = {}
+        self.meshes = {}
 
         self.extensions_managed = [
             "KHR_materials_pbrSpecularGlossiness"

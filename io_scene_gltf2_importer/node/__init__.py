@@ -55,9 +55,13 @@ class Node():
         self.transform = self.get_transforms()
 
         if 'mesh' in self.json.keys():
-            self.mesh = Mesh(self.json['mesh'], self.gltf.json['meshes'][self.json['mesh']], self.gltf)
-            self.mesh.read()
-            self.mesh.debug_missing()
+            if self.json['mesh'] not in self.gltf.meshes.keys():
+                self.gltf.meshes[self.json['mesh']] = Mesh(self.json['mesh'], self.gltf.json['meshes'][self.json['mesh']], self.gltf)
+                self.mesh = self.gltf.meshes[self.json['mesh']]
+                self.mesh.read()
+                self.mesh.debug_missing()
+            else:
+                self.mesh = self.gltf.meshes[self.json['mesh']]
 
             if 'skin' in self.json.keys():
                 self.mesh.rig(self.json['skin'], self.index)
