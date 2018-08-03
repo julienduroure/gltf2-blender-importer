@@ -106,8 +106,8 @@ class AnimationBone():
                         s = self.animation.gltf.convert.scale(list(key[1]))
                         transform = Matrix([
                             [s[0], 0, 0, 0],
-                            [0, s[1], 0, 0],
-                            [0, 0, s[2], 0],
+                            [0, s[2], 0, 0],
+                            [0, 0, s[1], 0],
                             [0, 0, 0, 1]
                         ])
 
