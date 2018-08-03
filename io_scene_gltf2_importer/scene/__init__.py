@@ -63,8 +63,6 @@ class Scene():
             if node not in parent_detector.keys():
                 self.root_nodes_idx.append(node)
 
-        print(self.root_nodes_idx)
-
     def blender_create(self):
     # Create a new scene only if not already exists in .blend file
     # TODO : put in current scene instead ?
