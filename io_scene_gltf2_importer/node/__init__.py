@@ -30,11 +30,10 @@ from ..camera import *
 from ..animation import *
 
 class Node():
-    def __init__(self, index, json, gltf, root, scene):
+    def __init__(self, index, json, gltf, scene):
         self.index = index
         self.json = json   # Node json
         self.gltf = gltf # Reference to global glTF instance
-        self.root = root
         self.scene = scene # Reference to scene
         self.mesh = None
         self.camera = None
@@ -76,7 +75,7 @@ class Node():
             return
 
         for child in self.json['children']:
-            child = Node(child, self.gltf.json['nodes'][child], self.gltf, False, self.scene)
+            child = Node(child, self.gltf.json['nodes'][child], self.gltf, self.scene)
             child.read()
             child.debug_missing()
             self.children.append(child)

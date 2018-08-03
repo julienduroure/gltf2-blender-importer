@@ -30,6 +30,7 @@ class Scene():
         self.json = json   # Scene json
         self.gltf = gltf # Reference to global glTF instance
         self.nodes = {}
+        self.root_nodes_idx = []
 
     def read(self):
         if 'name' in self.json.keys():
@@ -41,7 +42,7 @@ class Scene():
 
 
         for node_idx in self.json['nodes']:
-            node = Node(node_idx, self.gltf.json['nodes'][node_idx], self.gltf, True, self)
+            node = Node(node_idx, self.gltf.json['nodes'][node_idx], self.gltf, self)
             node.read()
             node.debug_missing()
             self.nodes[node_idx] = node
@@ -51,6 +52,18 @@ class Scene():
                 # skin.bones.insert(0, skin.root)
                 self.nodes[skin.root].is_joint = True
                 self.nodes[skin.root].skin_id = skin.index
+
+        # manage root nodes
+        parent_detector = {}
+        for node in self.nodes:
+            for child in self.nodes[node].children:
+                parent_detector[child.index] = node
+
+        for node in self.nodes:
+            if node not in parent_detector.keys():
+                self.root_nodes_idx.append(node)
+
+        print(self.root_nodes_idx)
 
     def blender_create(self):
     # Create a new scene only if not already exists in .blend file
@@ -66,9 +79,8 @@ class Scene():
         else:
             self.gltf.blender.set_scene(self.name)
 
-        for node in self.nodes.values():
-            if node.root:
-                node.blender_create(None) # None => No parent
+        for node in self.root_nodes_idx:
+            self.nodes[node].blender_create(None) # None => No parent
 
         # Now that all mesh / bones are created, create vertex groups on mesh
         for armature in self.gltf.skins.values():
@@ -80,9 +92,8 @@ class Scene():
         for armature in self.gltf.skins.values():
             armature.create_armature_modifiers()
 
-        for node in self.nodes.values():
-            if node.root:
-                node.animation.blender_anim()
+        for node in self.root_nodes_idx:
+                self.nodes[node].animation.blender_anim()
 
 
     # TODO create blender for other scenes
