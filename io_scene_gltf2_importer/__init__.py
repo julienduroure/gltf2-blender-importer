@@ -64,6 +64,9 @@ class ImportglTF2(Operator, ImportHelper):
         self.gltf.log.critical("glTF import is now finished")
         self.gltf.log.removeHandler(self.gltf.log_handler)
 
+        # Switch to newly created main scene
+        bpy.context.screen.scene = bpy.data.scenes[self.gltf.blender.scene]
+
         return {'FINISHED'}
 
 def menu_func_import(self, context):
