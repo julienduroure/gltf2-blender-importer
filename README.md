@@ -65,7 +65,7 @@ Sources of inspiration / technical stuff:
   *  Don't hesitate to contact me, you will find my email and phone number on my [website](http://julienduroure.com).
 
 # Releases
-*  v0.0.4:
+*  v0.0.4: [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.4/io_scene_gltf2_importer.zip)
     *  Fix non uniform scaling bug
     *  Fix root node management
     *  Better scene management in Blender:
