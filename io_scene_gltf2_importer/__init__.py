@@ -31,7 +31,7 @@ from .util import *
 
 bl_info = {
     "name": "glTF2 importer",
-    "version": (0, 0, 3),
+    "version": (0, 0, 4),
     "author": "Julien Duroure",
     "blender": (2, 79, 0),
     "description": "glTF2 importer",
