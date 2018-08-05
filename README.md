@@ -65,6 +65,13 @@ Sources of inspiration / technical stuff:
   *  Don't hesitate to contact me, you will find my email and phone number on my [website](http://julienduroure.com).
 
 # Releases
+*  v0.0.4:
+    *  Fix non uniform scaling bug
+    *  Fix root node management
+    *  Better scene management in Blender:
+        *   Automatic switch to newly created scene or scene where objects are created at end of import
+        *   If no scene name in file, create objects in active scene instead of creation of a new scene
+    *  Manage mesh instances (in parser only for now)
 *  v0.0.3: [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.3/io_scene_gltf2_importer.zip)
     *  Experimental use of KHR_materials_pbrSpecularGlossiness
     *  Fix bug when a texture file is missing
