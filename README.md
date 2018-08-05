@@ -66,9 +66,9 @@ Sources of inspiration / technical stuff:
 
 # Releases
 *  v0.0.3: [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.3/io_scene_gltf2_importer.zip)
-  *  Experimental use of KHR_materials_pbrSpecularGlossiness
-  *  Fix bug when a texture file is missing
-  *  Fix bug with armature parenting
+    *  Experimental use of KHR_materials_pbrSpecularGlossiness
+    *  Fix bug when a texture file is missing
+    *  Fix bug with armature parenting
 *  v0.0.2: Fix animation stuff. [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.2/io_scene_gltf2_importer.zip)
 *  v0.0.1: First release. [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.1/io_scene_gltf2_importer.zip)
 
