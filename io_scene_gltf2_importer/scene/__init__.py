@@ -70,7 +70,7 @@ class Scene():
             if self.name:
                 scene = bpy.data.scenes.new(self.name)
             else:
-                scene = bpy.data.scenes.new('Scene')
+                scene = bpy.context.scene
             scene.render.engine = "CYCLES"
 
             self.gltf.blender.set_scene(scene.name)
