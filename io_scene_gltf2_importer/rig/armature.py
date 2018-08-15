@@ -125,6 +125,8 @@ class Skin():
 
         offset = 0
         for prim in node.mesh.primitives:
+            idx_already_done = {}
+
             if 'JOINTS_0' in prim.attributes.keys() and 'WEIGHTS_0' in prim.attributes.keys():
 
                 joint_ = prim.attributes['JOINTS_0']['result']
@@ -133,10 +135,15 @@ class Skin():
                 for poly in obj.data.polygons:
                     for loop_idx in range(poly.loop_start, poly.loop_start + poly.loop_total):
                         vert_idx = obj.data.loops[loop_idx].vertex_index
+
+                        if vert_idx in idx_already_done.keys():
+                            continue
+                        idx_already_done[vert_idx] = True
+
                         if vert_idx in range(offset, offset + prim.vertices_length):
 
                             if offset != 0:
-                                tab_index = vert_idx % offset
+                                tab_index = vert_idx - offset
                             else:
                                 tab_index = vert_idx
 
