@@ -22,7 +22,7 @@ If you want to get very last features/bug corrections, you can create a zip file
 
 # What will NOT work (for now, until I implement it)  
 *  samplers in textures
-*  rigging stuff is experimental, but should work
+*  rigging stuff is experimental (depending on your file, you may have some problems in bone rotations, scaling, and something in locations.) Working on it!
 *  Camera data (currently only camera type and transforms)
 *  KHR_materials_pbrSpecularGlossiness extension
     *  alpha is not taken into account yet (WIP)
