@@ -103,7 +103,12 @@ class Skin():
         bone = obj.data.edit_bones.new(name)
         node.blender_bone_name = bone.name
         node.blender_armature_name = self.blender_armature_name
-        bone.tail = Vector((0.0,1.0,0.0)) # Needed to keep bone alive
+        if parent is not None and not self.gltf.scene.nodes[parent].is_joint: # For root bone
+            parent_scale = bpy.data.objects[self.gltf.scene.nodes[parent].blender_object].matrix_world.to_scale()
+            self.blender_armature_scale = 1.0/parent_scale[1]
+            bone.tail = Vector((0.0,self.blender_armature_scale,0.0)) # Needed to keep bone alive, and set scale
+        else:
+            bone.tail = Vector((0.0,self.blender_armature_scale,0.0)) # Needed to keep bone alive
         mat = self.set_bone_transforms(bone, node, parent)
         node.blender_bone_matrix = mat
 
