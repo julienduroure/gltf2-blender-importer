@@ -22,7 +22,7 @@
  """
 
 import bpy
-from mathutils import Quaternion, Matrix
+from mathutils import Quaternion, Matrix, Vector
 
 class AnimationBone():
     def __init__(self, animation):
@@ -32,7 +32,7 @@ class AnimationBone():
         obj   = bpy.data.objects[self.animation.gltf.skins[self.animation.node.skin_id].blender_armature_name]
         bone  = obj.pose.bones[self.animation.node.blender_bone_name]
         fps = bpy.context.scene.render.fps
-        delta = Quaternion((0.7071068286895752, 0.7071068286895752, 0.0, 0.0))
+
 
         for anim in self.animation.anims.keys():
             if self.animation.gltf.animations[anim].name:
@@ -53,19 +53,17 @@ class AnimationBone():
                     for key in channel.data:
                         transform = Matrix.Translation(self.animation.gltf.convert.location(list(key[1])))
                         if not self.animation.node.parent:
-                            mat = transform * delta.to_matrix().to_4x4()
+                            mat = transform
                         else:
                             if not self.animation.gltf.scene.nodes[self.animation.node.parent].is_joint: # TODO if Node in another scene
-                                parent_mat = bpy.data.objects[self.animation.gltf.scene.nodes[self.animation.node.parent].blender_object].matrix_world
-                                mat = transform * parent_mat.inverted()
+                                mat = transform
                             else:
                                 parent_mat = self.animation.gltf.scene.nodes[self.animation.node.parent].blender_bone_matrix
 
-                                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
-                                #TODO scaling of bones
+                                mat = (parent_mat.to_quaternion() * transform.to_quaternion()).to_matrix().to_4x4()
+                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * transform.to_translation() )) * mat
 
-                        bone.location = self.animation.node.blender_bone_matrix.to_translation() - mat.to_translation()
+                        bone.location = self.animation.node.blender_bone_matrix.inverted() * mat.to_translation()
                         bone.keyframe_insert(blender_path, frame = key[0] * fps, group='location')
 
 
@@ -79,17 +77,15 @@ class AnimationBone():
                     for key in channel.data:
                         transform = (self.animation.gltf.convert.quaternion(key[1])).to_matrix().to_4x4()
                         if not self.animation.node.parent:
-                            mat = transform * delta.to_matrix().to_4x4()
+                            mat = transform
                         else:
                             if not self.animation.gltf.scene.nodes[self.animation.node.parent].is_joint: # TODO if Node in another scene
-                                parent_mat = bpy.data.objects[self.animation.gltf.scene.nodes[self.animation.node.parent].blender_object].matrix_world
-                                mat = transform * parent_mat.inverted()
+                                mat = transform
                             else:
                                 parent_mat = self.animation.gltf.scene.nodes[self.animation.node.parent].blender_bone_matrix
 
-                                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
-                                #TODO scaling of bones
+                                mat = (parent_mat.to_quaternion() * transform.to_quaternion()).to_matrix().to_4x4()
+                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * transform.to_translation() )) * mat
 
                         bone.rotation_quaternion = self.animation.node.blender_bone_matrix.to_quaternion().inverted() * mat.to_quaternion()
                         bone.keyframe_insert(blender_path, frame = key[0] * fps, group='rotation')
@@ -106,26 +102,21 @@ class AnimationBone():
                         s = self.animation.gltf.convert.scale(list(key[1]))
                         transform = Matrix([
                             [s[0], 0, 0, 0],
-                            [0, s[2], 0, 0],
-                            [0, 0, s[1], 0],
+                            [0, s[1], 0, 0],
+                            [0, 0, s[2], 0],
                             [0, 0, 0, 1]
                         ])
 
                         if not self.animation.node.parent:
-                            mat = transform * delta.to_matrix().to_4x4()
+                            mat = transform
                         else:
                             if not self.animation.gltf.scene.nodes[self.animation.node.parent].is_joint: # TODO if Node in another scene
-                                parent_mat = bpy.data.objects[self.animation.gltf.scene.nodes[self.animation.node.parent].blender_object].matrix_world
-                                mat = transform * parent_mat.inverted()
+                                mat = transform
                             else:
                                 parent_mat = self.animation.gltf.scene.nodes[self.animation.node.parent].blender_bone_matrix
+                                mat = parent_mat.inverted() * transform
 
-                                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-                                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
-                                #TODO scaling of bones
-
-
-                        #bone.scale # TODO
+                        bone.scale = mat.to_scale()
                         bone.keyframe_insert(blender_path, frame = key[0] * fps, group='scale')
 
                     # Setting interpolation

@@ -67,23 +67,22 @@ class Skin():
 
     def set_bone_transforms(self, bone, node, parent):
         obj   = bpy.data.objects[self.blender_armature_name]
-        delta = Quaternion((0.7071068286895752, 0.7071068286895752, 0.0, 0.0))
 
         mat = Matrix()
         if parent is None:
             transform = node.get_transforms()
-            mat = transform * delta.to_matrix().to_4x4()
+            mat = transform
         else:
             if not self.gltf.scene.nodes[parent].is_joint: # TODO if Node in another scene
                 transform  = node.get_transforms()
-                mat = transform * delta.to_matrix().to_4x4()
+                mat = transform
+
             else:
                 transform = node.get_transforms()
                 parent_mat = obj.data.edit_bones[self.gltf.scene.nodes[parent].blender_bone_name].matrix # Node in another scene
 
-                mat = (parent_mat.to_quaternion() * delta.inverted() * transform.to_quaternion() * delta).to_matrix().to_4x4()
-                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * delta.inverted() * transform.to_translation() )) * mat
-                #TODO scaling of bones
+                mat = (parent_mat.to_quaternion() * transform.to_quaternion()).to_matrix().to_4x4()
+                mat = Matrix.Translation(parent_mat.to_translation() + ( parent_mat.to_quaternion() * transform.to_translation() ) ) * mat
 
         bone.matrix = mat
         return bone.matrix
@@ -104,7 +103,13 @@ class Skin():
         bone = obj.data.edit_bones.new(name)
         node.blender_bone_name = bone.name
         node.blender_armature_name = self.blender_armature_name
-        bone.tail = Vector((0.0,1.0,0.0)) # Needed to keep bone alive
+        if parent is not None and not self.gltf.scene.nodes[parent].is_joint: # For root bone
+            parent_scale = bpy.data.objects[self.gltf.scene.nodes[parent].blender_object].matrix_world.to_scale()
+            self.blender_armature_scale = 1.0/parent_scale[1]
+            bone.tail = Vector((0.0,self.blender_armature_scale,0.0)) # Needed to keep bone alive, and set scale
+        else:
+            bone.tail = Vector((0.0,self.blender_armature_scale,0.0)) # Needed to keep bone alive
+        bone.tail = Vector((0.0,1.0,0.0)) # Disable scaling for now
         mat = self.set_bone_transforms(bone, node, parent)
         node.blender_bone_matrix = mat
 
