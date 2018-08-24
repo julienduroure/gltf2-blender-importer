@@ -109,6 +109,7 @@ class Skin():
             bone.tail = Vector((0.0,self.blender_armature_scale,0.0)) # Needed to keep bone alive, and set scale
         else:
             bone.tail = Vector((0.0,self.blender_armature_scale,0.0)) # Needed to keep bone alive
+        bone.tail = Vector((0.0,1.0,0.0)) # Disable scaling for now
         mat = self.set_bone_transforms(bone, node, parent)
         node.blender_bone_matrix = mat
 
