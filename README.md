@@ -1,3 +1,6 @@
+# Important note
+This addon code is now merge into [official glTF 2.0 Blender IO addon from KhronosGroup][6]. Please use this official addon for your projects. My repo is no more updated with new features / bug fixing / performance updates.
+
 # glTF2 blender importer
 
 This blender addon is in an early development stage. It requires blender version 2.79 or higher.
@@ -65,6 +68,9 @@ Sources of inspiration / technical stuff:
   *  Don't hesitate to contact me, you will find my email and phone number on my [website](http://julienduroure.com).
 
 # Releases
+*  Please use [Official glTF-Blender-IO addon][6] instead of this one.
+
+# Old Releases
 *  v0.0.4: [Download here](https://github.com/julienduroure/gltf2-blender-importer/releases/download/v0.0.4/io_scene_gltf2_importer.zip)
     *  Fix non uniform scaling bug
     *  Fix root node management
@@ -84,3 +90,4 @@ Sources of inspiration / technical stuff:
 [3]: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/figures/gltfOverview-2.0.0a.png
 [4]: https://github.com/KhronosGroup/glTF-Sample-Models
 [5]: http://www.airbus.com/space.html
+[6]: https://github.com/KhronosGroup/glTF-Blender-IO
